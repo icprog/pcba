@@ -113,7 +113,7 @@ public class ServiceMessageCodes {
 	public static final String DUAL_SERIAL_NOT_FOUND_MSG = "Required  DualSerialNoIn,DualSerialNoOut and DualSerialNoType.";
 	public static final String TRI_SERIAL_NOT_FOUND_MSG = "Required TriSerialNoIn,TriSerialNoOut,TriSerialNoType,DualSerialNoIn,DualSerialNoOut and DualSerialNoType.";
 	public static final String EMAIL_MSG_CODE = "8002";
-	public static final String EMAIL_MSG = "Error - Contact Support Team.";
+	public static final String EMAIL_MSG = "Error - Serial number is not active.Please Contact Support Team.";
 	public static final String DUAL_SERIAL_NO_CODE = "5022";
 	public static final String DUAL_SERIAL_NO_CODE_MSG = "This DualSerialNoIn is not eligible for Dual Case.";
 	public static final String TRI_SERIAL_NO_CODE = "5023";

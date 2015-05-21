@@ -21,6 +21,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.log4j.Logger;
+
+import com.mot.upd.pcba.constants.ServiceMessageCodes;
 /**
  * @author rviswa
  *
@@ -40,7 +42,7 @@ public class MailUtil {
 		String subject=bundle.getString("emailSubject");
 
 		String body=bundle.getString("emailBody");
-		body = MessageFormat.format(body, serialNoIn,SerialNoOut);
+		body = MessageFormat.format(body, serialNoIn,SerialNoOut,ServiceMessageCodes.EMAIL_MSG_CODE,ServiceMessageCodes.EMAIL_MSG);
 
 
 		String from = USER_NAME;
