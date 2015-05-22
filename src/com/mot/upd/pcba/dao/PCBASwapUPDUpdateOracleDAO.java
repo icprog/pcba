@@ -92,29 +92,12 @@ PCBASwapUPDUpdateInterfaceDAO {
 				String serialNoOfstatus=rs.getString("ATTRIBUTE_37");
 				if(serialNoOfstatus!=null && !serialNoOfstatus.startsWith("ACT")){
 
-					StringBuffer stb = new StringBuffer();
-					stb.append("insert into upd.shipment_notavail_sn(SERIAL_NO_IN,SERIAL_NO_OUT,CREATED_BY,CREATION_DATETIME,LAST_MOD_BY,LAST_MOD_DATETIME,STATUS) values(?,?,?,?,?,?,?)");
-					prestmt = connection.prepareStatement(stb.toString());
-					prestmt.setString(1,
-							pCBASerialNoUPdateQueryInput.getSerialNoIn());
-					prestmt.setString(2,
-							pCBASerialNoUPdateQueryInput.getSerialNoOut());
-					prestmt.setString(3, "PCBA_PGM");
-					prestmt.setDate(4,
-							new java.sql.Date(System.currentTimeMillis()));
-					prestmt.setString(5, "PCBA_PGM");
-					prestmt.setDate(6,
-							new java.sql.Date(System.currentTimeMillis()));
-					prestmt.setString(7, "S");
-					prestmt.execute();
-
-					logger.info("Checking Status Of Shipment Table SQL:"+stb.toString());
-
-					MailUtil.sendEmail(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
-
+					sendEmail(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut(),connection,prestmt);
 					response.setResponseCode(ServiceMessageCodes.EMAIL_MSG_CODE);
 					response.setResponseMessage(ServiceMessageCodes.EMAIL_MSG);
-					//return response;
+					connection.commit();
+
+					
 				}else{
 
 					SQLQuery.append("update upd.UPD_SN_REPOS SET REQUEST_ID=?,REGION_ID=?,SYSTEM_ID=?,ATTRIBUTE_01=?,ATTRIBUTE_02=?,ATTRIBUTE_03=?,ATTRIBUTE_04=?,ATTRIBUTE_05=?,ATTRIBUTE_06=?,ATTRIBUTE_07=?,ATTRIBUTE_08=?,");
@@ -313,7 +296,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 					String DateToStr = format.format(curDate);
 
 					pstmt.setString(30, "ACT     " + DateToStr);// Status
-					
+
 					if(rs.getString("ATTRIBUTE_38")!=null && !(rs.getString("ATTRIBUTE_38").equals(""))){
 						pstmt.setString(31, rs.getString("ATTRIBUTE_38"));
 					}else{
@@ -734,7 +717,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 					}
 
 					pstmt.setLong(104, rs.getLong("ATTRIBUTE_118"));// Number
-					
+
 					if(rs.getDate("ATTRIBUTE_114")!=null && !(rs.getDate("ATTRIBUTE_114").equals(""))){
 						pstmt.setDate(105, rs.getDate("ATTRIBUTE_114"));
 					}else{
@@ -789,21 +772,21 @@ PCBASwapUPDUpdateInterfaceDAO {
 					boolean status = pstmt.execute();
 
 					logger.info("After Inserting Shipment Table SQL"+SQLQuery.toString());
-					
+
 					//Update SwapDate in MEID Table.
 					pstmt = null;
 					String serialMEIDupdate="update upd.upd_pcba_pgm_meid set SWAP_DATE=sysdate where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"'";
 					pstmt = connection.prepareStatement(serialMEIDupdate);
 					pstmt.execute();
-					
+
 					logger.info("serialNormalCase MEIDupdate SQL:"+serialMEIDupdate);
-					
+
 					//Update swapDate in IMEI Table 
 					pstmt = null;
 					String serialIMEIupdate="update upd.upd_pcba_pgm_imei set SWAP_DATE=sysdate where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"'";
 					pstmt = connection.prepareStatement(serialIMEIupdate);
 					pstmt.execute();
-					
+
 					logger.info("serialNormalCase IMEIupdate SQL:"+serialIMEIupdate);
 
 					if (!status) {
@@ -916,7 +899,19 @@ PCBASwapUPDUpdateInterfaceDAO {
 					+ e.getMessage());
 		} finally {
 			DBUtil.closeConnection(con, preparedStmt, rs);
-			DBUtil.connectionClosed(connection, pstmt);			
+			DBUtil.connectionClosed(connection, pstmt);	
+			try{
+				if(pstmt1!=null){
+					pstmt1.close();
+				}
+				if(prestmt!=null){
+					prestmt.close();
+				}
+			}catch(SQLException e){
+				logger.error(e.getMessage());
+				response.setResponseCode(""+ServiceMessageCodes.SQL_EXCEPTION);
+				response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
+			}
 		}
 
 		return response;
@@ -1580,7 +1575,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 				}
 
 				pstUpdate.setLong(104, rs.getLong("ATTRIBUTE_118"));// Number
-				
+
 				if(rs.getDate("ATTRIBUTE_114")!=null && !(rs.getDate("ATTRIBUTE_114").equals(""))){
 					pstUpdate.setDate(105, rs.getDate("ATTRIBUTE_114"));
 				}else{
@@ -1634,21 +1629,21 @@ PCBASwapUPDUpdateInterfaceDAO {
 				boolean status = pstUpdate.execute();
 
 				logger.info(" After Shipment Table Insert SQL:"+SQLInnerQuery.toString());
-				
+
 				//Update SwapDate in MEID Table.
 				pstUpdate = null;
 				String serialMEIDupdate="update upd.upd_pcba_pgm_meid set SWAP_DATE=sysdate where serial_no='"+serialNoOut+"'";
 				pstUpdate = connection2.prepareStatement(serialMEIDupdate);
 				pstUpdate.execute();
-				
+
 				logger.info("serialMEIDupdate SQL:"+serialMEIDupdate);
-				
+
 				//Update swapDate in IMEI Table 
 				pstUpdate = null;
 				String serialIMEIupdate="update upd.upd_pcba_pgm_imei set SWAP_DATE=sysdate where serial_no='"+serialNoOut+"'";
 				pstUpdate = connection2.prepareStatement(serialIMEIupdate);
 				pstUpdate.execute();
-				
+
 				logger.info("serialIMEIupdate SQL:"+serialIMEIupdate);
 
 				if (!status) {
@@ -1683,8 +1678,9 @@ PCBASwapUPDUpdateInterfaceDAO {
 			throw e;
 
 		} finally {
-			if (innerselectcon != null) {
-				innerselectcon.close();
+			DBUtil.closeConnection(innerselectcon, pst, rs);
+			if (pstUpdate != null) {
+				pstUpdate.close();
 			}
 		}
 
@@ -1708,7 +1704,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 			rs = pst.executeQuery();
 
 			logger.info("Reading Data Inside Shipment table(Status) SQL:"+sbuffer.toString());
-			
+
 
 			if (rs.next()) {
 
@@ -1744,6 +1740,11 @@ PCBASwapUPDUpdateInterfaceDAO {
 				e1.printStackTrace();
 			}
 			throw e;
+		}finally{
+			DBUtil.closeConnection(innerselectcon, pst, rs);
+			if(pstUpdate!=null){
+				pstUpdate.close();
+			}
 		}
 
 		return con;
@@ -1808,7 +1809,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 		}finally{
 			DBUtil.closeConnection(conn1, pstmt1, rs1);
-			DBUtil.connectionClosed(conn2, pstmt2);
+			DBUtil.closeConnection(conn2, pstmt2,rs2);
 		}
 		return referenceKeyCount;
 	}
