@@ -101,8 +101,8 @@ public class ServiceMessageCodes {
 	public static final String MEID_FAILURE_MSG = "pcba pgm failure";
 	public static final String INVALID_STATUS_MSG = "Status should be either S or F";
 	public static final String NO_LOCK_CODE_DETAILS_FOUND_MSG = "No Lock Code Details Found";
-	public static final String OLD_SERIAL_NO_NOT_FOUND_MSG = "Old Serial Not Found";
-	public static final String NEW_SERIAL_NO_NOT_FOUND_MSG = "New Serial Not Found";
+	public static final String OLD_SERIAL_NO_NOT_FOUND_MSG = "Old SerialNO Not Found";
+	public static final String NEW_SERIAL_NO_NOT_FOUND_MSG = "New SerialNO Not Found";
 	public static final String NO_DATASOURCE_FOUND_FOR_SERIAL_NO_MSG = "No DataSource found for SerialNO.";
 	public static final String IMEI_SUCCES_MSG = "Success";
 	public static final String IMEI_FAILURE_MSG = "pcba pgm failure";
