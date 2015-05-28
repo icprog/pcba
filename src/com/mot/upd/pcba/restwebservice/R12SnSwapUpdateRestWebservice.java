@@ -79,9 +79,10 @@ public class R12SnSwapUpdateRestWebservice {
 
 				}else{
 					//r12UpdateQueryResult.setSerialIn(r12UpdateQueryInput.getSerialNO());
-					r12UpdateQueryResult.setSerialOut(pCBASerialNumberModel.getOldSN());
-					r12UpdateQueryResult.setResponseCode(pCBASerialNumberModel.getResponseCode());
-					r12UpdateQueryResult.setResponseMsg(pCBASerialNumberModel.getResponseMsg());
+					//r12UpdateQueryResult.setSerialOut(pCBASerialNumberModel.getOldSN());
+					r12UpdateQueryResult.setSerialOut(serialSnCheckValue);
+					r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.OLD_SERIAL_NO_NOT_FOUND);
+					r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.OLD_SERIAL_NO_NOT_FOUND_MSG);
 				}
 			}else{
 					r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.R12_SN_NOT_VALID);

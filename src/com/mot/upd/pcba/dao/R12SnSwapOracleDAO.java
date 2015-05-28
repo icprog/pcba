@@ -82,19 +82,12 @@ public class R12SnSwapOracleDAO {
                     if(returnedMap1.get("VALUE_FOUND").equals("YES")) {
                                 //System.out.println("The serial number has reference and result=>"+returnedMap1.get("RESULT_SERIAL_NO"));
                     		logger.info("Old Serial number found : " + returnedMap1.get("RESULT_SERIAL_NO"));
-                    	// Old serial length check
-                        	//if((returnedMap1.get("RESULT_SERIAL_NO").length()==ServiceMessageCodes.SN_15_DIGIT)){       
                         		pCBASerialNumberModel.setOldSN(returnedMap1.get("RESULT_SERIAL_NO"));
-                        	//}else{
-                        	//	 pCBASerialNumberModel.setResponseCode(ServiceMessageCodes.R12_OLD_SN_NOT_VALID);
-                 			//	pCBASerialNumberModel.setResponseMsg(ServiceMessageCodes.R12_OLD_SN_NOT_VALID_MSG);
-                        //	}
+                        	
                     } else {
-                    			if(serialIn.equals(returnedMap1.get("RESULT_SERIAL_NO"))){
+                    			
                     				logger.info("Old Serial number not found : ");
-                                    pCBASerialNumberModel.setResponseCode(ServiceMessageCodes.R12_OLD_SN_NOT_AVAILABLE);
-                    				pCBASerialNumberModel.setResponseMsg(ServiceMessageCodes.OLD_SERIAL_NO_NOT_FOUND_MSG);
-                    			}
+                    			
                     }
 
 				}catch(SQLException e){
