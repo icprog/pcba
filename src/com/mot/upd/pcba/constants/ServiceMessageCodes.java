@@ -130,8 +130,8 @@ public class ServiceMessageCodes {
 	public static final String SNTYPE_MSG="snType can`t be balnk.";
 	public static final String STATUS_CODE="5030";
 	public static final String STATUS_MSG="status can`t be balnk.";
-	public static final String MANDATORY_STATUS_CODE="5031";
-	public static final String MANDATORY_STATUS_MSG="Any of msl,otksl,servicePassCode is mandatory";
+	//public static final String MANDATORY_STATUS_CODE="5031";
+	//public static final String MANDATORY_STATUS_MSG="Any of msl,otksl,servicePassCode is mandatory";
 	public static final String MANDATORY_SERIALNO_IN_CODE="5032";
 	public static final String SERIALNOTYPE_CODE="5033";
 	public static final String SERIALNOTYPE_MSG="serialNoType can`t be balnk.";
