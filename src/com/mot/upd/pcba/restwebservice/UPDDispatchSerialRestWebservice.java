@@ -613,7 +613,7 @@ public class UPDDispatchSerialRestWebservice {
 	 */
 	private boolean checkULMA(
 			DispatchSerialRequestPOJO dispatchSerialRequestPOJO) {
-		if (dispatchSerialRequestPOJO.getNumberOfUlma() == 0) {
+		if (dispatchSerialRequestPOJO.getNumberOfUlma() < 0) {
 			return true;
 		}
 		// TODO Auto-generated method stub

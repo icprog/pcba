@@ -1108,6 +1108,14 @@ public class DispatchSerialNumberOracleDAO implements DispatchSerialNumberDAO {
 			} else {
 				logger.debug("DispatchSerialNumberOracleDAO::dispatchULMAAddress:No ULMA to dispatch");
 				logger.info("DispatchSerialNumberOracleDAO::dispatchULMAAddress:No ULMA to dispatch");
+				
+				if(dispatchSerialRequestPOJO.getNumberOfUlma()==0){
+					//System.out.println("dispatchSerialRequestPOJO.getNumberOfUlma():"+dispatchSerialRequestPOJO.getNumberOfUlma());
+					logger.info("dispatchSerialRequestPOJO.getNumberOfUlma():"+dispatchSerialRequestPOJO.getNumberOfUlma());
+					dispatchSerialResponsePOJO.setUlmaAddress(ulmaAddress);
+					return dispatchSerialResponsePOJO;
+				}
+				
 				dispatchSerialResponsePOJO.reset();
 				dispatchSerialResponsePOJO
 						.setResponseCode(ServiceMessageCodes.NO_ULMA_AVAILABLE);
@@ -1198,6 +1206,12 @@ public class DispatchSerialNumberOracleDAO implements DispatchSerialNumberDAO {
 			} else {
 				logger.debug("DispatchSerialNumberOracleDAO::validateULMAAddress:No ULMA Available in DB");
 				logger.info("DispatchSerialNumberOracleDAO::validateULMAAddress:No ULMA Available in DB");
+				if(dispatchSerialRequestPOJO.getNumberOfUlma()==0){
+					//System.out.println("dispatchSerialRequestPOJO.getNumberOfUlma():"+dispatchSerialRequestPOJO.getNumberOfUlma());
+					logger.info("dispatchSerialRequestPOJO.getNumberOfUlma():"+dispatchSerialRequestPOJO.getNumberOfUlma());
+					//dispatchSerialResponsePOJO.setUlmaAddress(ulmaAddress);
+					return dispatchSerialResponsePOJO;
+				}
 				dispatchSerialResponsePOJO.reset();
 				dispatchSerialResponsePOJO
 						.setResponseCode(ServiceMessageCodes.NO_ULMA_AVAILABLE);
