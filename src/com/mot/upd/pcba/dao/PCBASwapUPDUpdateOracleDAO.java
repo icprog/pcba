@@ -292,10 +292,10 @@ PCBASwapUPDUpdateInterfaceDAO {
 					}
 
 					Date curDate = new Date();
-					SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yy");
+					SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
 					String DateToStr = format.format(curDate);
 
-					pstmt.setString(30, "ACT     " + DateToStr);// Status
+					pstmt.setString(30, "ACT       " + DateToStr);// Status
 
 					if(rs.getString("ATTRIBUTE_38")!=null && !(rs.getString("ATTRIBUTE_38").equals(""))){
 						pstmt.setString(31, rs.getString("ATTRIBUTE_38"));
@@ -791,7 +791,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 					if (!status) {
 
-						String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR     "
+						String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR       "
 								+ DateToStr
 								+ "',ATTRIBUTE_41='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"',LAST_MOD_BY='pcba_pgm_SwapUpdate',LAST_MOD_DATETIME=sysdate where serial_no='"
 								+ pCBASerialNoUPdateQueryInput.getSerialNoIn()
@@ -1151,10 +1151,10 @@ PCBASwapUPDUpdateInterfaceDAO {
 				}
 
 				Date curDate = new Date();
-				SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yy");
+				SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
 				String DateToStr = format.format(curDate);
 
-				pstUpdate.setString(30, "ACT     " + DateToStr);// Status
+				pstUpdate.setString(30, "ACT       " + DateToStr);// Status
 				if(rs.getString("ATTRIBUTE_38")!=null && !(rs.getString("ATTRIBUTE_38").equals(""))){
 					pstUpdate.setString(31, rs.getString("ATTRIBUTE_38"));
 				}else{
@@ -1648,7 +1648,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 				if (!status) {
 
-					String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR     "
+					String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR       "
 							+ DateToStr
 							+ "',ATTRIBUTE_41='"+serialNoOut+"',LAST_MOD_BY='pcba_pgm_SwapUpdate',LAST_MOD_DATETIME=sysdate where serial_no='"
 							+ serialNoIn
