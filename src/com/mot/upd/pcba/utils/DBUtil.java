@@ -70,7 +70,7 @@ public class DBUtil {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
-		String updConfig = null;
+		String updConfig = "NO";
 		String dbconfig = bundle.getString("dbConfig");
 		String query = "select value from upd.upd_config where key = " +
 				"'"+ dbconfig + "'";
