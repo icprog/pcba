@@ -54,15 +54,17 @@ public class R12SnSwapUpdateRestWebservice {
 		
 		try {
 			r12UpdateQueryResult.setSerialIn(serialIn);
-			
+			R12SnSwapOracleDAO r12SwapUpdateOraDAO = new R12SnSwapOracleDAO();
+			R12SnSwapMySQLDAO r12SwapUpdateMysqlDAO = new R12SnSwapMySQLDAO();
 			String serialSnCheckValue = DBUtil.checkValidSerialNumber(serialIn,"SerialIn");
+			String serialIndatabase = r12SwapUpdateOraDAO.checkSerialInDB(serialSnCheckValue);
 			//String serialSnCheckValue = MeidUtils.validateMEID(serialIn);
+			logger.info(" serial available in db  = " + serialIndatabase);
 			logger.info(" Request serialIn value from after check process  = " + serialSnCheckValue);
+			
 			if(serialSnCheckValue!=null && serialSnCheckValue.length()==ServiceMessageCodes.SN_15_DIGIT){
-				R12SnSwapOracleDAO r12SwapUpdateOraDAO = new R12SnSwapOracleDAO();
-				R12SnSwapMySQLDAO r12SwapUpdateMysqlDAO = new R12SnSwapMySQLDAO();
-
 				//PCBASerialNumberModel pCBASerialNumberModel = r12SwapUpdateDAO.fetchR12SerialOutValue(r12UpdateQueryInput.getSerialNO());
+				if(serialIndatabase !=null && serialIndatabase !=""){
 				String updConfig = DBUtil.dbConfigCheck();
 				logger.info("updConfig value : = " + updConfig);
 				if(updConfig.equals(PCBADataDictionary.DBCONFIG)){
@@ -85,10 +87,14 @@ public class R12SnSwapUpdateRestWebservice {
 					r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.OLD_SERIAL_NO_NOT_FOUND_MSG);
 				}
 			}else{
-					r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.R12_SN_NOT_VALID);
-					r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.SERIAL_NO_NOT_VALID_MSG);
+					//r12UpdateQueryResult.setSerialOut(serialSnCheckValue);
+					r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.R12_SN_NOT_AVAIL_IN_DATABSE);
+					r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.R12_SN_NOT_AVAIL_IN_DATABSE_MSG);
 				}
-					
+			}else{
+				r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.R12_SN_NOT_VALID);
+				r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.SERIAL_NO_NOT_VALID_MSG);
+			}
 			
 			} catch (NamingException e) {
 				r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);

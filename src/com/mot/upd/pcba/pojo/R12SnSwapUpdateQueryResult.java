@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "r12SnSwapUpdateQueryResult", propOrder={"serialIn", "serialOut", "responseCode","responseMsg"}
+@XmlType(name = "r12SnSwapUpdateQueryResult" , propOrder={"serialIn", "serialOut", "responseCode","responseMsg"}
 	,namespace="java:com.mot.upd.pcba.pojo")
 public class R12SnSwapUpdateQueryResult implements Serializable{
 	

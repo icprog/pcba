@@ -153,6 +153,8 @@ public class ServiceMessageCodes {
 	public static final String R12_SN_NOT_VALID = "5016";
 	public static final String R12_OLD_SN_NOT_VALID = "5025";
 	public static final String R12_OLD_SN_NOT_VALID_MSG = "OLD SerialNumber not valid";
+	public static final String R12_SN_NOT_AVAIL_IN_DATABSE = "5037";
+	public static final String R12_SN_NOT_AVAIL_IN_DATABSE_MSG = "SerialIN not available in database";
 
 	// public static final String JNDI_NOT_FOUND = "8003";
 	// public static final String JNDI_NOT_FOUND_MSG = "JNDI IS NOT AVAILABLE";
