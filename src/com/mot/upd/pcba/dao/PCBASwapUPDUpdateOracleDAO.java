@@ -97,7 +97,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 					response.setResponseMessage(ServiceMessageCodes.EMAIL_MSG);
 					connection.commit();
 
-					
+
 				}else{
 
 					SQLQuery.append("update upd.UPD_SN_REPOS SET REQUEST_ID=?,REGION_ID=?,SYSTEM_ID=?,ATTRIBUTE_01=?,ATTRIBUTE_02=?,ATTRIBUTE_03=?,ATTRIBUTE_04=?,ATTRIBUTE_05=?,ATTRIBUTE_06=?,ATTRIBUTE_07=?,ATTRIBUTE_08=?,");
@@ -188,10 +188,10 @@ PCBASwapUPDUpdateInterfaceDAO {
 						pstmt.setString(12,null);
 					}
 
-					if(rs.getDate("ATTRIBUTE_10")!=null && !(rs.getDate("ATTRIBUTE_10").equals(""))){
-						pstmt.setDate(13, rs.getDate("ATTRIBUTE_10"));
+					if(rs.getTimestamp("ATTRIBUTE_10")!=null && !(rs.getTimestamp("ATTRIBUTE_10").equals(""))){
+						pstmt.setTimestamp(13, rs.getTimestamp("ATTRIBUTE_10"));
 					}else{
-						pstmt.setDate(13, null);
+						pstmt.setTimestamp(13, null);
 					}
 
 					if(rs.getString("ATTRIBUTE_11")!=null && !(rs.getString("ATTRIBUTE_11").equals(""))){
@@ -315,8 +315,15 @@ PCBASwapUPDUpdateInterfaceDAO {
 						pstmt.setString(33,null);
 					}
 
-					if(rs.getString("ATTRIBUTE_41")!=null && !(rs.getString("ATTRIBUTE_41").equals(""))){
+					/*if(rs.getString("ATTRIBUTE_41")!=null && !(rs.getString("ATTRIBUTE_41").equals(""))){
 						pstmt.setString(34, rs.getString("ATTRIBUTE_41"));
+					}else{
+						pstmt.setString(34,null);
+					}*/
+
+					// ATTRIBUTE_41 related as follows
+					if(pCBASerialNoUPdateQueryInput.getSerialNoOut()!=null && !(pCBASerialNoUPdateQueryInput.getSerialNoOut().equals(""))){
+						pstmt.setString(34, pCBASerialNoUPdateQueryInput.getSerialNoOut());
 					}else{
 						pstmt.setString(34,null);
 					}
@@ -1047,10 +1054,10 @@ PCBASwapUPDUpdateInterfaceDAO {
 					pstUpdate.setString(12,null);
 				}
 
-				if(rs.getDate("ATTRIBUTE_10")!=null && !(rs.getDate("ATTRIBUTE_10").equals(""))){
-					pstUpdate.setDate(13, rs.getDate("ATTRIBUTE_10"));
+				if(rs.getTimestamp("ATTRIBUTE_10")!=null && !(rs.getTimestamp("ATTRIBUTE_10").equals(""))){
+					pstUpdate.setTimestamp(13, rs.getTimestamp("ATTRIBUTE_10"));
 				}else{
-					pstUpdate.setDate(13, null);
+					pstUpdate.setTimestamp(13, null);
 				}
 
 				if(rs.getString("ATTRIBUTE_11")!=null && !(rs.getString("ATTRIBUTE_11").equals(""))){
@@ -1173,8 +1180,15 @@ PCBASwapUPDUpdateInterfaceDAO {
 					pstUpdate.setString(33,null);
 				}
 
-				if(rs.getString("ATTRIBUTE_41")!=null && !(rs.getString("ATTRIBUTE_41").equals(""))){
+				/*if(rs.getString("ATTRIBUTE_41")!=null && !(rs.getString("ATTRIBUTE_41").equals(""))){
 					pstUpdate.setString(34, rs.getString("ATTRIBUTE_41"));
+				}else{
+					pstUpdate.setString(34,null);
+				}*/
+
+				// ATTRIBUTE_41 as follows
+				if(serialNoOut!=null && !(serialNoOut.equals(""))){
+					pstUpdate.setString(34,serialNoOut);
 				}else{
 					pstUpdate.setString(34,null);
 				}
