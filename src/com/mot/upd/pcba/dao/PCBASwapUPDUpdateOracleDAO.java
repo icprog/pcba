@@ -81,7 +81,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 					pCBASerialNoUPdateQueryInput.getSerialNoIn());
 			rs = preparedStmt.executeQuery();
 
-			logger.info("After Shipment Data Reading SQL:"+sb.toString());
+			//logger.info("After Shipment Data Reading SQL:"+sb.toString());
 
 			if (rs.next()) {
 

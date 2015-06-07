@@ -34,7 +34,7 @@ public class MailUtil {
 
 
 	public static  void sendEmail(String serialNoIn,String SerialNoOut)throws Exception{
-
+		logger.info("logger information sendEmail start");
 		final String USER_NAME = bundle.getString("username");
 		final String server=bundle.getString("server");
 		final String portNO=bundle.getString("portNO");
@@ -46,7 +46,7 @@ public class MailUtil {
 
 
 		String from = USER_NAME;
-
+		logger.info("from --------------------" + from);
 		String[] to = { RECIPIENT }; // list of recipient email addresses
 
 		Properties props = System.getProperties();

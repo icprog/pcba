@@ -5,16 +5,21 @@ package com.mot.upd.pcba.utils;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author HRDJ36 Thammaiah M B
  *
  */
 
 public class ApplicationProperties {
+	
+	private static Logger logger = Logger.getLogger(ApplicationProperties.class);
 
 	// Instance objects
 	private static ApplicationProperties _instance;
 	private final String MOT_ENV_STRING = "com.mot.corp.GISEnvironment";
+	
 	private String _strEnvironment;
 
 	private static HashMap fileProperty = new HashMap();
@@ -43,8 +48,11 @@ public class ApplicationProperties {
 		// PROD)
 		// Default to DEV if no value provided (Better to mess up dev database
 		// than any of the other ones...)
-		_strEnvironment = System.getProperty(MOT_ENV_STRING, "TEST");
+		//_strEnvironment = System.getProperty(MOT_ENV_STRING, "TEST");
+		_strEnvironment = System.getProperty(MOT_ENV_STRING, null);
+		logger.info("_strEnvironment -------------------" + _strEnvironment);
 		if (_strEnvironment != null && !_strEnvironment.equals("")) {
+			logger.info("_strEnvironment ------------------inside if-" + _strEnvironment);
 			_strEnvironment = _strEnvironment.toLowerCase();
 		} else {
 			System.out
