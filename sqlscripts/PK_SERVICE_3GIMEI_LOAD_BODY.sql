@@ -141,7 +141,7 @@ BEGIN
         ELSE 
        --   dbms_output.put_line('1');
           --dbms_output.put_line(v_prd_mkt_name);
-          v_prog_facility := 'PCBAPGMAGT';
+          v_prog_facility := 'PCBA_PGM_AGENT';
           v_created_by  :='PCBAPGMAGT';
           v_updated_by :='PCBAPGMAGT ';
           insert into UPD.UPD_PCBA_PGM_IMEI (SERIAL_NO, MARKET_NAME,MODEL_NUMBER,REQUEST_ID,REQUESTER,GENERATION_DATE,GPPD_ID,                

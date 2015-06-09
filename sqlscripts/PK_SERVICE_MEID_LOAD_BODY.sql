@@ -207,7 +207,7 @@ BEGIN
         status:='SUCCESS';
         ELSE
        -- dbms_output.put_line('1');
-        v_prog_facility := 'PCBAPGMAGT';
+        v_prog_facility := 'PCBA_PGM_AGENT';
         v_created_by  :='PCBAPGMAGT';
         v_updated_by :='PCBAPGMAGT';
         INSERT INTO UPD.UPD_PCBA_PGM_MEID
