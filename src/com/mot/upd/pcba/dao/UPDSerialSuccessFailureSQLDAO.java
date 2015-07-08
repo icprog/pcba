@@ -5,6 +5,7 @@ package com.mot.upd.pcba.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -27,11 +28,8 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 
 	private DataSource ds;
 	private Connection con = null;
-	private PreparedStatement preparedStmt = null;
-	private Connection conn = null;
 	private PreparedStatement pstmt = null;
-	private Connection connection = null;
-	private PreparedStatement prestmt = null;
+
 	PCBAProgramResponse response = new PCBAProgramResponse();
 
 	public PCBAProgramResponse updateIMEIStatusSuccess(PCBAProgramQueryInput pcbaProgramQueryInput){
@@ -47,38 +45,76 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 		}
 
 		try {
-			// get database connection
+			// Get database connection
 			con = DBUtil.getConnection(ds);
-			String IMEIStatusSuccess_SQL="update upd.upd_lock_code  set LAST_MOD_BY='pcba_pgm_success',motorola_master='"+pcbaProgramQueryInput.getMsl()+"',LAST_MOD_DATETIME=NOW() WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			preparedStmt = con.prepareStatement(IMEIStatusSuccess_SQL);
-			preparedStmt.execute();
+			con.setAutoCommit(false);
+
+			StringBuffer IMEIStatusSuccess_SQL=new StringBuffer();
+			IMEIStatusSuccess_SQL.append("update upd.upd_lock_code  set LAST_MOD_BY='pcba_pgm_success',");
+
+			// ATTRIBUTE_25
+			if(pcbaProgramQueryInput.getMsl()!=null && !(pcbaProgramQueryInput.getMsl().equals(""))){
+				IMEIStatusSuccess_SQL.append("motorola_master='"+pcbaProgramQueryInput.getMsl()+"',");
+			}
+
+			// ATTRIBUTE_28
+			if(pcbaProgramQueryInput.getOtksl()!=null && !(pcbaProgramQueryInput.getOtksl().equals(""))){
+				IMEIStatusSuccess_SQL.append("motorola_onetime='"+pcbaProgramQueryInput.getOtksl()+"',");
+			}
+
+			// ATTRIBUTE_29
+			if(pcbaProgramQueryInput.getServicePassCode()!=null && !(pcbaProgramQueryInput.getServicePassCode().equals(""))){
+				IMEIStatusSuccess_SQL.append("service_password='"+pcbaProgramQueryInput.getServicePassCode()+"',");
+			}
+
+
+			IMEIStatusSuccess_SQL.append("LAST_MOD_DATETIME=NOW() WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'");
+			pstmt = con.prepareStatement(IMEIStatusSuccess_SQL.toString());
+			pstmt.execute();
 			logger.info("IMEI MY SQL Query:"+IMEIStatusSuccess_SQL);
 
+			pstmt =null;
+
+			String handsetType = "update upd.upd_device_config  set handset_type='GSM',LAST_MOD_DATETIME=NOW(),LAST_MOD_BY='pcba_pgm_success' WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			pstmt = con.prepareStatement(handsetType);
+			pstmt.execute();
+
+			logger.info("IMEI Status Success handsetType SQL Query :"+handsetType);
+
+			pstmt=null;
+
 			String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_success' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			conn=DBUtil.getConnection(ds);
-			pstmt = conn.prepareStatement(MYSQL_QueryIMEI);
+			pstmt = con.prepareStatement(MYSQL_QueryIMEI);
 			pstmt.execute();
 			logger.info("IMEIStatusSuccess-MY SQLQueryIMEI:"+MYSQL_QueryIMEI);
 
+			pstmt=null;
+
 			String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_success' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			connection=DBUtil.getConnection(ds);
-			prestmt = connection.prepareStatement(MYSQL_QueryMEID);
-			prestmt.execute();
+			pstmt = con.prepareStatement(MYSQL_QueryMEID);
+			pstmt.execute();
 			logger.info("IMEIStatusSuccess-MY SQLQueryMEID:"+MYSQL_QueryMEID);
+
+			con.commit();
 
 			response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
 			response.setResponseCode(ServiceMessageCodes.OLD_SN_SUCCESS);
 			response.setResponseMessage(ServiceMessageCodes.IMEI_SUCCES_MSG);
 
 		}catch(Exception e){
+
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			logger.info("Update IMEIStatusSuccess error:"+e);
 			response.setResponseCode(""+ServiceMessageCodes.SQL_EXCEPTION);
 			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG);
 		}
-		finally{
-			DBUtil.connectionClosed(con, preparedStmt);
-			DBUtil.connectionClosed(conn, pstmt);
-			DBUtil.connectionClosed(connection, prestmt);
+		finally{			
+			DBUtil.connectionClosed(con, pstmt);
+
 		}
 
 		return response;			
@@ -98,39 +134,76 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 		}
 
 		try {
-			// get database connection
+			// Get database connection
 			con = DBUtil.getConnection(ds);
+			con.setAutoCommit(false);
 
-			String IMEIStatusFailure_SQL="update upd.upd_lock_code  set LAST_MOD_BY='pcba_pgm_failure',motorola_master='"+pcbaProgramQueryInput.getMsl()+"',LAST_MOD_DATETIME=NOW() WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			preparedStmt = con.prepareStatement(IMEIStatusFailure_SQL);
-			preparedStmt.execute();
+			StringBuffer IMEIStatusFailure_SQL=new StringBuffer();
+			IMEIStatusFailure_SQL.append("update upd.upd_lock_code  set LAST_MOD_BY='pcba_pgm_failure',");
+
+			// ATTRIBUTE_25
+			if(pcbaProgramQueryInput.getMsl()!=null && !(pcbaProgramQueryInput.getMsl().equals(""))){
+				IMEIStatusFailure_SQL.append("motorola_master='"+pcbaProgramQueryInput.getMsl()+"',");
+			}
+
+			// ATTRIBUTE_28
+			if(pcbaProgramQueryInput.getOtksl()!=null && !(pcbaProgramQueryInput.getOtksl().equals(""))){
+				IMEIStatusFailure_SQL.append("motorola_onetime='"+pcbaProgramQueryInput.getOtksl()+"',");
+			}
+
+			// ATTRIBUTE_29
+			if(pcbaProgramQueryInput.getServicePassCode()!=null && !(pcbaProgramQueryInput.getServicePassCode().equals(""))){
+				IMEIStatusFailure_SQL.append("service_password='"+pcbaProgramQueryInput.getServicePassCode()+"',");
+			}
+
+
+			IMEIStatusFailure_SQL.append("LAST_MOD_DATETIME=NOW() WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'");
+			pstmt = con.prepareStatement(IMEIStatusFailure_SQL.toString());
+			pstmt.execute();
 			logger.info("IMEI MY SQL Query:"+IMEIStatusFailure_SQL);
 
+			pstmt =null;
+
+			String handsetType = "update upd.upd_device_config  set handset_type='GSM',LAST_MOD_DATETIME=NOW(),LAST_MOD_BY='pcba_pgm_failure' WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			pstmt = con.prepareStatement(handsetType);
+			pstmt.execute();
+
+			logger.info("IMEI Status Failure handsetType SQL Query :"+handsetType);
+
+			pstmt=null;
+
 			String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			conn=DBUtil.getConnection(ds);
-			pstmt = conn.prepareStatement(MYSQL_QueryIMEI);
+			pstmt = con.prepareStatement(MYSQL_QueryIMEI);
 			pstmt.execute();
 			logger.info("IMEIStatusFailure-MY SQLQueryIMEI:"+MYSQL_QueryIMEI);
 
+			pstmt = null;
+
 			String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			connection=DBUtil.getConnection(ds);
-			prestmt = connection.prepareStatement(MYSQL_QueryMEID);
-			prestmt.execute();
+			pstmt = con.prepareStatement(MYSQL_QueryMEID);
+			pstmt.execute();
 			logger.info("IMEIStatusFailure-MY SQLQueryMEID:"+MYSQL_QueryMEID);
+
+			con.commit();
 
 			response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
 			response.setResponseCode(""+ServiceMessageCodes.IMEI_FAILURE);
 			response.setResponseMessage(ServiceMessageCodes.IMEI_FAILURE_MSG);
 
 		}catch(Exception e){
+
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			logger.info("Update IMEIStatusFailure error:"+e);
 			response.setResponseCode(""+ServiceMessageCodes.SQL_EXCEPTION);
 			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG);
 		}
-		finally{
-			DBUtil.connectionClosed(con, preparedStmt);
-			DBUtil.connectionClosed(conn, pstmt);
-			DBUtil.connectionClosed(connection, prestmt);
+		finally{			
+			DBUtil.connectionClosed(con, pstmt);
+
 		}
 
 		return response;
@@ -146,27 +219,41 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 			return response;
 		}
 		try{
-			// get database connection
+			// Get database connection
 			con = DBUtil.getConnection(ds);
+
+			con.setAutoCommit(false);
 
 			StringBuffer sb=new StringBuffer();
 			String MEIDStatusSuccess_SQL="update upd.upd_lock_code set LAST_MOD_BY='pcba_pgm_success',LAST_MOD_DATETIME=NOW() WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			preparedStmt = con.prepareStatement(MEIDStatusSuccess_SQL);
-			preparedStmt.execute();
+			pstmt = con.prepareStatement(MEIDStatusSuccess_SQL);
+			pstmt.execute();
 
 			logger.info("MEID MY SQL Query:"+sb.toString());
 
+			pstmt =null;
+
+			String handsetType = "update upd.upd_device_config  set handset_type='CDMA',LAST_MOD_DATETIME=NOW(),LAST_MOD_BY='pcba_pgm_success' WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			pstmt = con.prepareStatement(handsetType);
+			pstmt.execute();
+
+			logger.info("MEID Status Success MY SQL Query:"+handsetType);
+
+			pstmt = null;
+
 			String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_success' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			conn=DBUtil.getConnection(ds);
-			pstmt = conn.prepareStatement(MYSQL_QueryIMEI);
+			pstmt = con.prepareStatement(MYSQL_QueryIMEI);
 			pstmt.execute();
 			logger.info("MEIDStatusSuccess-MY SQLQueryIMEI:"+MYSQL_QueryIMEI);
 
+			pstmt = null;
+
 			String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_success' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			connection=DBUtil.getConnection(ds);
-			prestmt = connection.prepareStatement(MYSQL_QueryMEID);
-			prestmt.execute();
+			pstmt = con.prepareStatement(MYSQL_QueryMEID);
+			pstmt.execute();
 			logger.info("MEIDStatusSuccess - MY SQLQueryMEID:"+MYSQL_QueryMEID);
+
+			con.commit();
 
 			response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
 			response.setResponseCode(ServiceMessageCodes.OLD_SN_SUCCESS);
@@ -174,14 +261,19 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 
 
 		}catch(Exception e){
+
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+
 			logger.info("Update MEIDStatusSuccess error:"+e);
 			response.setResponseCode(""+ServiceMessageCodes.SQL_EXCEPTION);
 			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+e.getMessage());
 		}
-		finally{
-			DBUtil.connectionClosed(con, preparedStmt);
-			DBUtil.connectionClosed(conn, pstmt);
-			DBUtil.connectionClosed(connection, prestmt);
+		finally{			
+			DBUtil.connectionClosed(con, pstmt);			
 		}
 
 		return response;
@@ -199,41 +291,61 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 			return response;
 		}
 		try{
-			// get database connection
+			// Get database connection
 			con = DBUtil.getConnection(ds);
+
+			con.setAutoCommit(false);
+
 			String MEIDStatusFailure_SQL="update upd.upd_lock_code  set LAST_MOD_BY='pcba_pgm_failure',LAST_MOD_DATETIME=NOW() WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
 
-			preparedStmt = con.prepareStatement(MEIDStatusFailure_SQL);
-			preparedStmt.execute();
+			pstmt = con.prepareStatement(MEIDStatusFailure_SQL);
+			pstmt.execute();
 
 			logger.info("updateMEIDStatusFailure MY SQL Query:"+MEIDStatusFailure_SQL);
 
+			pstmt =null;
+
+			String handsetType = "update upd.upd_device_config  set handset_type='CDMA',LAST_MOD_DATETIME=NOW(),LAST_MOD_BY='pcba_pgm_failure' WHERE serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			pstmt = con.prepareStatement(handsetType);
+			pstmt.execute();
+
+			logger.info("MEID Status Failure MY SQL Query:"+handsetType);
+
+			pstmt = null;
+
 			String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			conn=DBUtil.getConnection(ds);
-			pstmt = conn.prepareStatement(MYSQL_QueryIMEI);
+			pstmt = con.prepareStatement(MYSQL_QueryIMEI);
 			pstmt.execute();
 			logger.info("MEIDStatusFailure-MY SQLQueryIMEI:"+MYSQL_QueryIMEI);
 
+			pstmt = null;
+
 			String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
-			connection=DBUtil.getConnection(ds);
-			prestmt = connection.prepareStatement(MYSQL_QueryMEID);
-			prestmt.execute();
+			pstmt = con.prepareStatement(MYSQL_QueryMEID);
+			pstmt.execute();
 			logger.info("MEIDStatusFailure-SQLQueryMEID:"+MYSQL_QueryMEID);
+
+			con.commit();
 
 			response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
 			response.setResponseCode(""+ServiceMessageCodes.MEID_FAILURE);
 			response.setResponseMessage(ServiceMessageCodes.MEID_FAILURE_MSG);
 
 		}catch(Exception e){
+
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+
 			logger.info("Update MEIDStatusSuccess error:"+e);
 			response.setResponseCode(""+ServiceMessageCodes.SQL_EXCEPTION);
 			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG);
 
 		}
 		finally{
-			DBUtil.connectionClosed(con, preparedStmt);
-			DBUtil.connectionClosed(conn, pstmt);
-			DBUtil.connectionClosed(connection, prestmt);
+			DBUtil.connectionClosed(con, pstmt);			
 		}
 
 		return response;
