@@ -1932,5 +1932,39 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 		return innerselectcon;
 	}
 
+	@Override
+	public PCBASerialNoUPdateResponse validateGppId(String serialNoIn,
+			String serialNoOut) {
+		// TODO Auto-generated method stub
+		return response;
+	}
+
+	@Override
+	public PCBASerialNoUPdateResponse validateProtocol(String serialNoIn,
+			String serialNoOut) {
+		// TODO Auto-generated method stub
+		return response;
+	}
+
+	@Override
+	public void sendAnEmail(String serialNoIn, String serialNoOut,
+			String emailMessageCode, String emailMessage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public PCBASerialNoUPdateResponse calculateNoOfMACAddressForNormalCase(
+			String serialNoIn, String serialNoOut) {
+		// TODO Auto-generated method stub
+		return response;
+	}
+
+	@Override
+	public PCBASerialNoUPdateResponse calculateNoOfMACAddress(
+			String serialNoOut, String dualSerialNoOut, String triSerialNoOut) {
+		// TODO Auto-generated method stub
+		return response;
+	}
 
 }
