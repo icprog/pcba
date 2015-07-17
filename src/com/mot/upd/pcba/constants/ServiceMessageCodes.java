@@ -142,6 +142,8 @@ public class ServiceMessageCodes {
 	public static final String REPAIREDATE_MSG="repaireDate can`t be balnk.";
 	public static final String TRI_SERIALNOTYPE_CODE="5036";
 	public static final String TRI_SERIALNOTYPE_MSG="TriSerialNoType should be either MEID or IMEI";
+	public static final String SERIAL_NO_OUT_MSG_CODE="5031";
+	public static final String SERIAL_NO_OUT_MSG="serialNoOut status should be either VOI or ACT";
 	
 	
 
