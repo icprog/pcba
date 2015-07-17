@@ -8,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.PropertyResourceBundle;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 
 import javax.naming.NamingException;
@@ -21,16 +19,8 @@ import com.mot.upd.pcba.constants.ServiceMessageCodes;
 import com.mot.upd.pcba.pojo.PCBASerialNoUPdateQueryInput;
 import com.mot.upd.pcba.pojo.PCBASerialNoUPdateResponse;
 import com.mot.upd.pcba.utils.DBUtil;
-import com.mot.upd.pcba.utils.InitProperty;
 import com.mot.upd.pcba.utils.MailUtil;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
+
 
 /**
  * @author rviswa
@@ -98,10 +88,17 @@ PCBASwapUPDUpdateInterfaceDAO {
 				connection = DBUtil.getConnection(ds);
 				connection.setAutoCommit(false);
 
+
 				String serialNoOfstatus=rs.getString("ATTRIBUTE_37");
+				if(serialNoOfstatus!=null && !serialNoOfstatus.startsWith("ACT")){
+
+					sendEmail(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut(),connection,prestmt);
+					response.setResponseCode(ServiceMessageCodes.EMAIL_MSG_CODE);
+					response.setResponseMessage(ServiceMessageCodes.EMAIL_MSG);
+					connection.commit();
 
 
-				if((serialNoOfstatus != null && serialNoOfstatus.startsWith("ACT")) || (serialNoOfstatus != null && serialNoOfstatus.startsWith("BTL"))){
+				}else{
 
 					SQLQuery.append("update upd.UPD_SN_REPOS SET REQUEST_ID=?,REGION_ID=?,SYSTEM_ID=?,ATTRIBUTE_01=?,ATTRIBUTE_02=?,ATTRIBUTE_03=?,ATTRIBUTE_04=?,ATTRIBUTE_05=?,ATTRIBUTE_06=?,ATTRIBUTE_07=?,ATTRIBUTE_08=?,");
 					SQLQuery.append("ATTRIBUTE_09=?,  ATTRIBUTE_10=?,  ATTRIBUTE_11=?,  ATTRIBUTE_12=?,  ATTRIBUTE_13=?,  ATTRIBUTE_14=?, ATTRIBUTE_15=?,  ATTRIBUTE_16=?,  ATTRIBUTE_17=?,  ATTRIBUTE_18=?,  ATTRIBUTE_19=?,");
@@ -298,13 +295,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 					SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
 					String DateToStr = format.format(curDate);
 
-					if(serialNoOfstatus!=null && serialNoOfstatus.startsWith("ACT")){
-						pstmt.setString(30, "ACT       " + DateToStr);// Status
-					}
-
-					if(serialNoOfstatus!=null && serialNoOfstatus.startsWith("BTL")){
-						pstmt.setString(30, "BTL       " + DateToStr);// Status
-					}
+					pstmt.setString(30, "ACT       " + DateToStr);// Status
 
 					if(rs.getString("ATTRIBUTE_38")!=null && !(rs.getString("ATTRIBUTE_38").equals(""))){
 						pstmt.setString(31, rs.getString("ATTRIBUTE_38"));
@@ -791,7 +782,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 					//Update SwapDate in MEID Table.
 					pstmt = null;
-					String serialMEIDupdate="update upd.upd_pcba_pgm_meid set SWAP_DATE=sysdate,OLD_SERIAL_NO='"+pCBASerialNoUPdateQueryInput.getSerialNoIn()+"' where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"'";
+					String serialMEIDupdate="update upd.upd_pcba_pgm_meid set SWAP_DATE=sysdate where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"'";
 					pstmt = connection.prepareStatement(serialMEIDupdate);
 					pstmt.execute();
 
@@ -799,7 +790,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 					//Update swapDate in IMEI Table 
 					pstmt = null;
-					String serialIMEIupdate="update upd.upd_pcba_pgm_imei set SWAP_DATE=sysdate,OLD_SERIAL_NO='"+pCBASerialNoUPdateQueryInput.getSerialNoIn()+"' where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"'";
+					String serialIMEIupdate="update upd.upd_pcba_pgm_imei set SWAP_DATE=sysdate where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"'";
 					pstmt = connection.prepareStatement(serialIMEIupdate);
 					pstmt.execute();
 
@@ -821,11 +812,6 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 					response.setResponseCode(ServiceMessageCodes.OLD_SN_SUCCESS);
 					response.setResponseMessage(ServiceMessageCodes.OLD_SERIAL_FOUND_SUCCSS_MSG);
-				}else{
-					sendEmail(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut(),connection,prestmt);
-					response.setResponseCode(ServiceMessageCodes.EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.EMAIL_MSG);
-					connection.commit();
 				}
 
 			} else {
@@ -846,7 +832,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 				if (!(pCBASerialNoUPdateQueryInput.getDualSerialNoIn().trim() == "")) {
 
 					String DualStatus = getStatus(pCBASerialNoUPdateQueryInput.getDualSerialNoIn());
-					if((DualStatus!=null && DualStatus.startsWith("ACT")) || (DualStatus!=null && DualStatus.startsWith("BTL"))){
+					if(DualStatus!=null && DualStatus.startsWith("ACT")){
 						connection = updateReferenceTable(
 								pCBASerialNoUPdateQueryInput.getSerialNoIn(),
 								pCBASerialNoUPdateQueryInput.getSerialNoOut(),
@@ -882,7 +868,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 					String triStatus = getStatus(pCBASerialNoUPdateQueryInput.getTriSerialNoIn());
 
-					if((triStatus!=null && triStatus.startsWith("ACT")) || (triStatus!=null && triStatus.startsWith("BTL"))){
+					if(triStatus!=null && triStatus.startsWith("ACT")){
 						connection = updateBasedOnSerial(
 								pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),
 								pCBASerialNoUPdateQueryInput.getTriSerialNoOut(),
@@ -1175,17 +1161,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 				SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
 				String DateToStr = format.format(curDate);
 
-				String serialNoInStatus=rs.getString("ATTRIBUTE_37");
-
-				if(serialNoInStatus!=null && serialNoInStatus.startsWith("ACT")){
-					pstUpdate.setString(30, "ACT       " + DateToStr);// Status
-				}
-
-				if(serialNoInStatus!=null && serialNoInStatus.startsWith("BTL")){
-					pstUpdate.setString(30, "BTL       " + DateToStr);// Status
-				}
-
-
+				pstUpdate.setString(30, "ACT       " + DateToStr);// Status
 				if(rs.getString("ATTRIBUTE_38")!=null && !(rs.getString("ATTRIBUTE_38").equals(""))){
 					pstUpdate.setString(31, rs.getString("ATTRIBUTE_38"));
 				}else{
@@ -1670,7 +1646,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 				//Update SwapDate in MEID Table.
 				pstUpdate = null;
-				String serialMEIDupdate="update upd.upd_pcba_pgm_meid set SWAP_DATE=sysdate,OLD_SERIAL_NO='"+serialNoIn+"' where serial_no='"+serialNoOut+"'";
+				String serialMEIDupdate="update upd.upd_pcba_pgm_meid set SWAP_DATE=sysdate where serial_no='"+serialNoOut+"'";
 				pstUpdate = connection2.prepareStatement(serialMEIDupdate);
 				pstUpdate.execute();
 
@@ -1678,7 +1654,7 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 				//Update swapDate in IMEI Table 
 				pstUpdate = null;
-				String serialIMEIupdate="update upd.upd_pcba_pgm_imei set SWAP_DATE=sysdate,OLD_SERIAL_NO='"+serialNoIn+"' where serial_no='"+serialNoOut+"'";
+				String serialIMEIupdate="update upd.upd_pcba_pgm_imei set SWAP_DATE=sysdate where serial_no='"+serialNoOut+"'";
 				pstUpdate = connection2.prepareStatement(serialIMEIupdate);
 				pstUpdate.execute();
 
@@ -1854,9 +1830,9 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 	public String getStatus(String serialNoIn){
 
-		Connection connection1=null;
-		PreparedStatement preparedStatement1=null;
-		ResultSet resultSet1=null;
+		Connection conn1=null;
+		PreparedStatement pstmt1=null;
+		ResultSet rs1=null;
 		String status=null;
 		// TODO Auto-generated method stub
 		try {
@@ -1871,20 +1847,20 @@ PCBASwapUPDUpdateInterfaceDAO {
 
 		try {
 			// get database connection
-			connection1 = DBUtil.getConnection(ds);
+			conn1 = DBUtil.getConnection(ds);
 			String query="select ATTRIBUTE_37 from upd.UPD_SN_REPOS where serial_no=?";
-			preparedStatement1 = connection1.prepareStatement(query);
-			preparedStatement1.setString(1,serialNoIn);
-			resultSet1 = preparedStatement1.executeQuery();
-			if(resultSet1.next()){
-				status =resultSet1.getString("ATTRIBUTE_37");
+			pstmt1 = conn1.prepareStatement(query);
+			pstmt1.setString(1,serialNoIn);
+			rs1 = pstmt1.executeQuery();
+			if(rs1.next()){
+				status =rs.getString("ATTRIBUTE_37");
 			}
 
 			logger.info("Status of Serial No in Shipment:"+query);
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			DBUtil.closeConnection(connection1, preparedStatement1, resultSet1);
+			DBUtil.closeConnection(conn1, pstmt1, rs1);
 		}
 		return status;
 	}
@@ -1917,745 +1893,4 @@ PCBASwapUPDUpdateInterfaceDAO {
 		return innerselectcon;
 	}
 
-	// Start July 08 2015
-
-	@Override
-	public PCBASerialNoUPdateResponse validateGppId(String serialNoIn,String serialNoOut) {
-		// TODO Auto-generated method stub
-
-		Connection connection1=null;
-		PreparedStatement preparedStatement1=null;
-		ResultSet resultSet1=null;
-		Connection connection2=null;
-		PreparedStatement preparedStatement2=null;
-		ResultSet resultSet2=null;
-		String serialNoInGppId=null;
-		String serialNoOutGppId=null;
-
-		try {
-
-			ds = DBUtil.getOracleDataSource();
-		} catch (NamingException e) {
-			logger.info("Data source not found in MEID:" + e);
-			response.setResponseCode(""+ServiceMessageCodes.NO_DATASOURCE_FOUND);
-			response.setResponseMessage(ServiceMessageCodes.NO_DATASOURCE_FOUND_FOR_SERIAL_NO_MSG);
-			return response;
-		}
-
-		try {
-
-			// get database connection
-			connection1 = DBUtil.getConnection(ds);
-			String query="select ATTRIBUTE_120 from upd.UPD_SN_REPOS where serial_no=?";
-			preparedStatement1 = connection1.prepareStatement(query);
-			preparedStatement1.setString(1,serialNoIn);
-			resultSet1 = preparedStatement1.executeQuery();
-			//System.out.println("query:"+query);
-			if(resultSet1.next()){
-				serialNoInGppId =resultSet1.getString("ATTRIBUTE_120");
-			}
-
-			//System.out.println("query:"+query);
-
-			connection2 = DBUtil.getConnection(ds);
-			String query1="select ATTRIBUTE_120 from upd.UPD_SN_REPOS where serial_no=?";
-			preparedStatement2 = connection2.prepareStatement(query1);
-			preparedStatement2.setString(1,serialNoOut);
-			resultSet2 = preparedStatement2.executeQuery();
-			//System.out.println("query1:"+query1);
-			if(resultSet2.next()){
-				serialNoOutGppId =resultSet2.getString("ATTRIBUTE_120");
-			}
-
-			if((serialNoInGppId!=null && !serialNoInGppId.equals("")) && (serialNoOutGppId != null && !serialNoOutGppId.equals(""))){
-				if(serialNoInGppId.equals(serialNoOutGppId)){
-					// Continue i.e serial_In and Serial_Out Having same GPPD_ID
-					response.setResponseCode(null);
-					response.setResponseMessage(null);
-				}else{
-					sendAnEmail(serialNoIn,serialNoOut,ServiceMessageCodes.GPP_ID_EMAIL_MSG_CODE,ServiceMessageCodes.GPP_ID_EMAIL_MSG);
-					response.setResponseCode(ServiceMessageCodes.GPP_ID_EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.GPP_ID_EMAIL_MSG);
-				}
-
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-		}finally{
-			DBUtil.closeConnection(connection1, preparedStatement1, resultSet1);
-			DBUtil.closeConnection(connection2, preparedStatement2, resultSet2);
-		}
-		return response;	
-	}
-
-	@Override
-	public PCBASerialNoUPdateResponse validateProtocol(String serialNoIn,String serialNoOut) {
-		// TODO Auto-generated method stub
-
-		Connection connection3=null;
-		PreparedStatement preparedStatement3=null;
-		ResultSet resultSet3=null;
-		Connection connection4=null;
-		PreparedStatement preparedStatement4=null;
-		ResultSet resultSet4=null;
-		String serialNoInProtocol=null;
-		String serialNoOutProtocol=null;
-
-		try {
-
-			ds = DBUtil.getOracleDataSource();
-		} catch (NamingException e) {
-			logger.info("Data source not found in MEID:" + e);
-			response.setResponseCode(""+ServiceMessageCodes.NO_DATASOURCE_FOUND);
-			response.setResponseMessage(ServiceMessageCodes.NO_DATASOURCE_FOUND_FOR_SERIAL_NO_MSG);
-			return response;
-		}
-
-		try {
-
-			// get database connection
-			connection3 = DBUtil.getConnection(ds);
-			String query="select PROTOCOL from UPD.UPD_MEID where serial_no=?";
-			preparedStatement3 = connection3.prepareStatement(query);
-			preparedStatement3.setString(1,serialNoIn);
-			resultSet3 = preparedStatement3.executeQuery();
-
-			if(resultSet3.next()){
-				serialNoInProtocol =resultSet3.getString("PROTOCOL");
-			}
-
-			connection4 = DBUtil.getConnection(ds);
-			String query1="select PROTOCOL from UPD.UPD_MEID where serial_no=?";
-			preparedStatement4 = connection4.prepareStatement(query1);
-			preparedStatement4.setString(1,serialNoOut);
-			resultSet4 = preparedStatement4.executeQuery();
-
-			if(resultSet4.next()){
-				serialNoOutProtocol =resultSet4.getString("PROTOCOL");
-			}
-
-			if((serialNoInProtocol!=null && !serialNoInProtocol.equals("")) && (serialNoOutProtocol != null && !serialNoOutProtocol.equals(""))){
-				if(serialNoInProtocol.equals(serialNoOutProtocol)){
-					// Continue i.e serial_In and Serial_Out Having same PROTOCOL
-					response.setResponseCode(null);
-					response.setResponseMessage(null);
-				}else{
-					sendAnEmail(serialNoIn,serialNoOut,ServiceMessageCodes.PROTOCOL_EMAIL_MSG_CODE,ServiceMessageCodes.PROTOCOL_EMAIL_MSG);
-					response.setResponseCode(ServiceMessageCodes.PROTOCOL_EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.PROTOCOL_EMAIL_MSG);
-				}
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-		}finally{
-			DBUtil.closeConnection(connection3, preparedStatement3, resultSet3);
-			DBUtil.closeConnection(connection4, preparedStatement4, resultSet4);
-		}
-		return response;	
-	} 
-
-	@Override
-	public PCBASerialNoUPdateResponse calculateNoOfMACAddressForNormalCase(String serialNoIn, String serialNoOut) {
-		// TODO Auto-generated method stub
-
-		Connection connection5=null;
-		PreparedStatement preparedStatement5=null;
-		ResultSet resultSet5=null;
-		Connection connection6=null;
-		PreparedStatement preparedStatement6=null;
-		ResultSet resultSet6=null;
-
-		String serialNoInUlma=null;
-		String serialNoInWlan=null;
-		String serialNoInwlan2=null;
-		String serialNoInwlan3=null;
-		String serialNoInwlan4=null;
-
-		String serialNoOutUlma=null;
-		String serialNoOutWlan=null;
-		String serialNoOutwlan2=null;
-		String serialNoOutwlan3=null;
-		String serialNoOutwlan4=null;
-		try {
-
-			ds = DBUtil.getOracleDataSource();
-		} catch (NamingException e) {
-			logger.info("Data source not found in MEID:" + e);
-			response.setResponseCode(""+ServiceMessageCodes.NO_DATASOURCE_FOUND);
-			response.setResponseMessage(ServiceMessageCodes.NO_DATASOURCE_FOUND_FOR_SERIAL_NO_MSG);
-			return response;
-		}
-
-		try {
-
-			// get database connection
-			connection5 = DBUtil.getConnection(ds);
-			String query="select attribute_36,attribute_83,attribute_102,attribute_103,attribute_104 from UPD.upd_sn_repos where serial_no=?";
-			preparedStatement5 = connection5.prepareStatement(query);
-			preparedStatement5.setString(1,serialNoIn);
-			resultSet5 = preparedStatement5.executeQuery();
-			int count1=0;
-			int count2=0;
-			if(resultSet5.next()){
-				serialNoInUlma = resultSet5.getString("attribute_36");
-				serialNoInWlan = resultSet5.getString("attribute_83");
-				serialNoInwlan2= resultSet5.getString("attribute_102");
-				serialNoInwlan3= resultSet5.getString("attribute_103");
-				serialNoInwlan4= resultSet5.getString("attribute_104");
-
-				if(serialNoInUlma!=null && !serialNoInUlma.equals("")){
-					count1++;
-				}
-				if(serialNoInWlan!=null && !serialNoInWlan.equals("")){
-					count1++;
-				}
-				if(serialNoInwlan2!=null && !serialNoInwlan2.equals("")){
-					count1++;
-				}
-				if(serialNoInwlan3!=null && !serialNoInwlan3.equals("")){
-					count1++;
-				}
-				if(serialNoInwlan4!=null && !serialNoInwlan4.equals("")){
-					count1++;
-				}
-				System.out.println("count1:"+count1);
-			}
-
-			connection6 = DBUtil.getConnection(ds);
-			String query1="select attribute_36,attribute_83,attribute_102,attribute_103,attribute_104 from UPD.upd_sn_repos where serial_no=?";
-			preparedStatement6 = connection6.prepareStatement(query1);
-			preparedStatement6.setString(1,serialNoOut);
-			resultSet6 = preparedStatement6.executeQuery();
-
-			if(resultSet6.next()){
-
-				serialNoOutUlma = resultSet6.getString("attribute_36");
-				serialNoOutWlan = resultSet6.getString("attribute_83");
-				serialNoOutwlan2= resultSet6.getString("attribute_102");
-				serialNoOutwlan3= resultSet6.getString("attribute_103");
-				serialNoOutwlan4= resultSet6.getString("attribute_104");
-
-				if(serialNoOutUlma!=null && !serialNoOutUlma.equals("")){
-					count2++;
-				}
-				if(serialNoOutWlan!=null && !serialNoOutWlan.equals("")){
-					count2++;
-				}
-				if(serialNoOutwlan2!=null && !serialNoOutwlan2.equals("")){
-					count2++;
-				}
-				if(serialNoOutwlan3!=null && !serialNoOutwlan3.equals("")){
-					count2++;
-				}if(serialNoOutwlan4!=null && !serialNoOutwlan4.equals("")){
-					count2++;
-				}
-				System.out.println("count2:"+count2);
-			}
-
-			if(count1 == count2){
-				// Continue i.e serial_In and Serial_Out Having same calculateNoOfULMA/MAC Address
-				response.setResponseCode(null);
-				response.setResponseMessage(null);			
-
-			}else{
-
-				sendAnEmail(serialNoIn,serialNoOut,ServiceMessageCodes.MAC_ULMA_EMAIL_MSG_CODE,ServiceMessageCodes.MAC_ULMA_EMAIL_MSG);
-				response.setResponseCode(ServiceMessageCodes.MAC_ULMA_EMAIL_MSG_CODE);
-				response.setResponseMessage(ServiceMessageCodes.MAC_ULMA_EMAIL_MSG);			
-
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-		}finally{
-			DBUtil.closeConnection(connection5, preparedStatement5, resultSet5);
-			DBUtil.closeConnection(connection6, preparedStatement6, resultSet6);
-		}
-		return response;	
-	}
-	@Override
-	public PCBASerialNoUPdateResponse calculateNoOfMACAddress(String serialNoOut, String dualSerialNoOut, String triSerialNoOut) {
-		// TODO Auto-generated method stub
-
-		Connection conn1=null;
-		PreparedStatement prestmt1=null;
-		ResultSet rs1=null;
-
-		Connection conn2=null;
-		PreparedStatement prestmt2=null;
-		ResultSet rs2=null;
-
-		Connection conn3=null;
-		PreparedStatement prestmt3=null;
-		ResultSet rs3=null;
-
-		String serialNoOutUlma=null;
-		String serialNoOutWlan=null;
-		String serialNoOutwlan2=null;
-		String serialNoOutwlan3=null;
-		String serialNoOutwlan4=null;
-
-		String dualSerialNoOutUlma=null;
-		String dualSerialNoOutWlan=null;
-		String dualSerialNoOutwlan2=null;
-		String dualSerialNoOutwlan3=null;
-		String dualSerialNoOutwlan4=null;
-
-		String triSerialNoOutUlma=null;
-		String triSerialNoOutWlan=null;
-		String triSerialNoOutwlan2=null;
-		String triSerialNoOutwlan3=null;
-		String triSerialNoOutwlan4=null;
-
-
-		try {
-
-			ds = DBUtil.getOracleDataSource();
-		} catch (NamingException e) {
-			logger.info("Data source not found in MEID:" + e);
-			response.setResponseCode(""+ServiceMessageCodes.NO_DATASOURCE_FOUND);
-			response.setResponseMessage(ServiceMessageCodes.NO_DATASOURCE_FOUND_FOR_SERIAL_NO_MSG);
-			return response;
-		}
-
-		try {
-
-			// get database connection
-			conn1 = DBUtil.getConnection(ds);
-			String query="select attribute_36,attribute_83,attribute_102,attribute_103,attribute_104 from UPD.upd_sn_repos where serial_no=?";
-			prestmt1 = conn1.prepareStatement(query);
-			prestmt1.setString(1,serialNoOut);
-			rs1 = prestmt1.executeQuery();
-			int count1=0;
-			int count2=0;
-			int count3=0;
-
-			if(rs1.next()){
-				serialNoOutUlma = rs1.getString("attribute_36");
-				serialNoOutWlan = rs1.getString("attribute_83");
-				serialNoOutwlan2= rs1.getString("attribute_102");
-				serialNoOutwlan3= rs1.getString("attribute_103");
-				serialNoOutwlan4= rs1.getString("attribute_104");
-
-				if(serialNoOutUlma!=null && !serialNoOutUlma.equals("")){
-					count1++;
-				}
-				if(serialNoOutWlan!=null && !serialNoOutWlan.equals("")){
-					count1++;
-				}
-				if(serialNoOutwlan2!=null && !serialNoOutwlan2.equals("")){
-					count1++;
-				}
-				if(serialNoOutwlan3!=null && !serialNoOutwlan3.equals("")){
-					count1++;
-				}
-				if(serialNoOutwlan4!=null && !serialNoOutwlan4.equals("")){
-					count1++;
-				}
-				System.out.println("count1:"+count1);
-			}
-
-			conn2 = DBUtil.getConnection(ds);
-			String query1="select attribute_36,attribute_83,attribute_102,attribute_103,attribute_104 from UPD.upd_sn_repos where serial_no=?";
-			prestmt2 = conn2.prepareStatement(query1);
-			prestmt2.setString(1,dualSerialNoOut);
-			rs2 = prestmt2.executeQuery();
-
-			if(rs2.next()){
-
-				dualSerialNoOutUlma = rs2.getString("attribute_36");
-				dualSerialNoOutWlan = rs2.getString("attribute_83");
-				dualSerialNoOutwlan2= rs2.getString("attribute_102");
-				dualSerialNoOutwlan3= rs2.getString("attribute_103");
-				dualSerialNoOutwlan4= rs2.getString("attribute_104");
-
-				if(dualSerialNoOutUlma!=null && !dualSerialNoOutUlma.equals("")){
-					count2++;
-				}
-				if(dualSerialNoOutWlan!=null && !dualSerialNoOutWlan.equals("")){
-					count2++;
-				}
-				if(dualSerialNoOutwlan2!=null && !dualSerialNoOutwlan2.equals("")){
-					count2++;
-				}
-				if(dualSerialNoOutwlan3!=null && !dualSerialNoOutwlan3.equals("")){
-					count2++;
-				}if(dualSerialNoOutwlan4!=null && !dualSerialNoOutwlan4.equals("")){
-					count2++;
-				}
-				System.out.println("count2:"+count2);
-			}
-
-			String UpdateQuery="update UPD.upd_sn_repos set attribute_36=?,attribute_83=?,attribute_102=?,attribute_103=?,attribute_104=? where serial_no=?";
-
-			if(triSerialNoOut!=null && !triSerialNoOut.equals("")){
-				conn3 = DBUtil.getConnection(ds);
-				String query2="select attribute_36,attribute_83,attribute_102,attribute_103,attribute_104 from UPD.upd_sn_repos where serial_no=?";
-				prestmt3 = conn3.prepareStatement(query2);
-				prestmt3.setString(1,triSerialNoOut);
-				rs3 = prestmt3.executeQuery();
-
-				if(rs3.next()){
-
-					triSerialNoOutUlma = rs2.getString("attribute_36");
-					triSerialNoOutWlan = rs2.getString("attribute_83");
-					triSerialNoOutwlan2= rs2.getString("attribute_102");
-					triSerialNoOutwlan3= rs2.getString("attribute_103");
-					triSerialNoOutwlan4= rs2.getString("attribute_104");
-
-					if(triSerialNoOutUlma!=null && !triSerialNoOutUlma.equals("")){
-						count3++;
-					}
-					if(triSerialNoOutWlan!=null && !triSerialNoOutWlan.equals("")){
-						count3++;
-					}
-					if(triSerialNoOutwlan2!=null && !triSerialNoOutwlan2.equals("")){
-						count3++;
-					}
-					if(triSerialNoOutwlan3!=null && !triSerialNoOutwlan3.equals("")){
-						count3++;
-					}if(triSerialNoOutwlan4!=null && !triSerialNoOutwlan4.equals("")){
-						count3++;
-					}
-					System.out.println("count3:"+count3);
-				}	
-
-				if(count1== count2 && count2== count3){
-					// Continue i.e Serial_Out,dualSerial_Out and triSerial_Out Having same calculateNoOfULMA/MAC Address
-					response.setResponseCode(null);
-					response.setResponseMessage(null);
-				}else if(count1<count2){
-
-					conn1 = DBUtil.getConnection(ds);
-					prestmt1 = conn1.prepareStatement(UpdateQuery);
-					prestmt1.setString(1,dualSerialNoOutUlma);
-					prestmt1.setString(2,dualSerialNoOutWlan);
-					prestmt1.setString(3,dualSerialNoOutwlan2);
-					prestmt1.setString(4,dualSerialNoOutwlan3);
-					prestmt1.setString(5,dualSerialNoOutwlan4);
-					prestmt1.setString(6,serialNoOut);
-					prestmt1.execute();
-					
-					sendAnEmailForULMAorMACKAddressNotMatch(serialNoOut,dualSerialNoOut,null,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-					response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-
-				}else if(count2<count3){
-					conn2 = DBUtil.getConnection(ds);
-					prestmt2 = conn2.prepareStatement(UpdateQuery);
-					prestmt2.setString(1,triSerialNoOutUlma);
-					prestmt2.setString(2,triSerialNoOutWlan);
-					prestmt2.setString(3,triSerialNoOutwlan2);
-					prestmt2.setString(4,triSerialNoOutwlan3);
-					prestmt2.setString(5,triSerialNoOutwlan4);
-					prestmt2.setString(6,dualSerialNoOut);
-					prestmt2.execute();
-					
-					sendAnEmailForULMAorMACKAddressNotMatch(null,dualSerialNoOut,triSerialNoOut,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-					response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-
-
-				}else if(count3<count1){
-					conn3 = DBUtil.getConnection(ds);
-					prestmt3 = conn3.prepareStatement(UpdateQuery);
-					prestmt3.setString(1,serialNoOutUlma);
-					prestmt3.setString(2,serialNoOutWlan);
-					prestmt3.setString(3,serialNoOutwlan2);
-					prestmt3.setString(4,serialNoOutwlan3);
-					prestmt3.setString(5,serialNoOutwlan4);
-					prestmt3.setString(6,triSerialNoOut);
-					prestmt3.execute();
-					
-					sendAnEmailForULMAorMACKAddressNotMatch(serialNoOut,null,triSerialNoOut,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-					response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-
-
-				}else if(count3<count2){
-
-					Connection conn4=null;
-					PreparedStatement prestmt4=null;
-					try{
-					conn4 = DBUtil.getConnection(ds);
-					prestmt4 = conn4.prepareStatement(UpdateQuery);
-					prestmt4.setString(1,dualSerialNoOutUlma);
-					prestmt4.setString(2,dualSerialNoOutWlan);
-					prestmt4.setString(3,dualSerialNoOutwlan2);
-					prestmt4.setString(4,dualSerialNoOutwlan3);
-					prestmt4.setString(5,dualSerialNoOutwlan4);
-					prestmt4.setString(6,triSerialNoOut);
-					prestmt4.execute();
-					
-					sendAnEmailForULMAorMACKAddressNotMatch(null,dualSerialNoOut,triSerialNoOut,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-					response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-					
-				}catch(Exception e){
-					e.printStackTrace();
-					logger.error(e.getMessage());
-					response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-					response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-
-				}finally{
-					DBUtil.connectionClosed(conn4,prestmt4);
-				}
-
-
-
-				}else if(count2<count1){
-
-					Connection conn5=null;
-					PreparedStatement prestmt5=null;
-					try{						
-						conn5 = DBUtil.getConnection(ds);
-						prestmt5 = conn5.prepareStatement(UpdateQuery);
-						prestmt5.setString(1,serialNoOutUlma);
-						prestmt5.setString(2,serialNoOutWlan);
-						prestmt5.setString(3,serialNoOutwlan2);
-						prestmt5.setString(4,serialNoOutwlan3);
-						prestmt5.setString(5,serialNoOutwlan4);
-						prestmt5.setString(6,dualSerialNoOut);
-						prestmt5.execute();
-						
-						sendAnEmailForULMAorMACKAddressNotMatch(serialNoOut,dualSerialNoOut,null,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-						response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-						response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-						
-					}catch(Exception e){
-						e.printStackTrace();
-						logger.error(e.getMessage());
-						response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-						response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-
-					}finally{
-						DBUtil.connectionClosed(conn5,prestmt5);
-					}
-				}else if(count1<count3){
-					Connection conn6=null;
-					PreparedStatement prestmt6=null;
-					try{
-						conn6 = DBUtil.getConnection(ds);
-						prestmt6 = conn6.prepareStatement(UpdateQuery);
-						prestmt6.setString(1,triSerialNoOutUlma);
-						prestmt6.setString(2,triSerialNoOutWlan);
-						prestmt6.setString(3,triSerialNoOutwlan2);
-						prestmt6.setString(4,triSerialNoOutwlan3);
-						prestmt6.setString(5,triSerialNoOutwlan4);
-						prestmt6.setString(6,serialNoOut);
-						prestmt6.execute();
-						
-						sendAnEmailForULMAorMACKAddressNotMatch(serialNoOut,null,triSerialNoOut,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-						response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-						response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-						
-					}catch(Exception e){
-						e.printStackTrace();
-						logger.error(e.getMessage());
-						response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-						response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-
-					}finally{
-						DBUtil.connectionClosed(conn6,prestmt6);
-					}
-
-
-				}
-
-			} else if(count1 == count2){
-				// Continue i.e Serial_Out and dualSerial_Out Having same calculateNoOfULMA/MAC Address
-				response.setResponseCode(null);
-				response.setResponseMessage(null);
-			}else if(count1>count2){
-				conn1 = DBUtil.getConnection(ds);
-				prestmt1 = conn1.prepareStatement(UpdateQuery);
-				prestmt1.setString(1,serialNoOutUlma);
-				prestmt1.setString(2,serialNoOutWlan);
-				prestmt1.setString(3,serialNoOutwlan2);
-				prestmt1.setString(4,serialNoOutwlan3);
-				prestmt1.setString(5,serialNoOutwlan4);
-				prestmt1.setString(6,dualSerialNoOut);
-				prestmt1.execute();
-
-				sendAnEmailForULMAorMACKAddressNotMatch(serialNoOut,dualSerialNoOut,null,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-				response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-				response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-
-
-			}else{
-				conn2 = DBUtil.getConnection(ds);
-				prestmt2 = conn2.prepareStatement(UpdateQuery);
-				prestmt2.setString(1,dualSerialNoOutUlma);
-				prestmt2.setString(2,dualSerialNoOutWlan);
-				prestmt2.setString(3,dualSerialNoOutwlan2);
-				prestmt2.setString(4,dualSerialNoOutwlan3);
-				prestmt2.setString(5,dualSerialNoOutwlan4);
-				prestmt2.setString(6,serialNoOut);
-				prestmt2.execute();
-
-				sendAnEmailForULMAorMACKAddressNotMatch(serialNoOut,dualSerialNoOut,null,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE,ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-				response.setResponseCode(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG_CODE);
-				response.setResponseMessage(ServiceMessageCodes.ULMA_MAC_EMAIL_MSG);
-			}
-
-
-
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			response.setResponseCode(ServiceMessageCodes.SQL_EXCEPTION);
-			response.setResponseMessage(ServiceMessageCodes.SQL_EXCEPTION_MSG+ e.getMessage());
-		}finally{
-			DBUtil.closeConnection(conn1, prestmt1, rs1);
-			DBUtil.closeConnection(conn2, prestmt2, rs2);
-			DBUtil.closeConnection(conn3, prestmt3, rs3);
-		}
-		return response;	
-	}
-	public static void sendAnEmailForULMAorMACKAddressNotMatch(String serialNoOut,String dualSerialNoOut,String triSerialNoOut,String emailMessageCode,String emailMessage){
-
-		// TODO Auto-generated method stub
-		PropertyResourceBundle bundle = InitProperty.getProperty("pcbaMail.properties");
-
-		logger.info("logger information sendEmail start");
-		final String USER_NAME = bundle.getString("username");
-		final String server=bundle.getString("server");
-		final String portNO=bundle.getString("portNO");
-		final String RECIPIENT=bundle.getString("recipient");
-		String subject=bundle.getString("emailSubject");
-
-		String body=bundle.getString("newEmailBody");
-
-		if(((serialNoOut!=null && !serialNoOut.equals("")) && (dualSerialNoOut!=null && !dualSerialNoOut.equals("")))){
-			body = MessageFormat.format(body, serialNoOut,dualSerialNoOut,emailMessageCode,emailMessage);
-		}else if(((dualSerialNoOut!=null && !dualSerialNoOut.equals("")) && (triSerialNoOut!=null && !triSerialNoOut.equals("")))){
-			body = MessageFormat.format(body, dualSerialNoOut,triSerialNoOut,emailMessageCode,emailMessage);
-		}else if(((triSerialNoOut!=null && !triSerialNoOut.equals("")) && (serialNoOut!=null && !serialNoOut.equals("")))){
-			body = MessageFormat.format(body, triSerialNoOut,serialNoOut,emailMessageCode,emailMessage);
-		}else if(((triSerialNoOut!=null && !triSerialNoOut.equals("")) && (dualSerialNoOut!=null && !dualSerialNoOut.equals("")))){
-			body = MessageFormat.format(body, triSerialNoOut,dualSerialNoOut,emailMessageCode,emailMessage);
-		}else if(((dualSerialNoOut!=null && !dualSerialNoOut.equals("")) && (serialNoOut!=null && !serialNoOut.equals("")))){
-			body = MessageFormat.format(body, dualSerialNoOut,serialNoOut,emailMessageCode,emailMessage);
-		}else if(((serialNoOut!=null && !serialNoOut.equals("")) && (triSerialNoOut!=null && !triSerialNoOut.equals("")))){
-			body = MessageFormat.format(body, serialNoOut,triSerialNoOut,emailMessageCode,emailMessage);
-		}
-
-
-
-		String from = USER_NAME;
-		logger.info("from --------------------" + from);
-		String[] to = { RECIPIENT }; // list of recipient email addresses
-
-		Properties props = System.getProperties();
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", server);
-		props.put("mail.smtp.user", from);
-		props.put("mail.smtp.port", portNO);
-		props.put("mail.smtp.auth", "false");
-
-		Session session = Session.getDefaultInstance(props);
-		MimeMessage message = new MimeMessage(session);
-
-		try {
-			message.setFrom(new InternetAddress(from));
-			InternetAddress[] toAddress = new InternetAddress[to.length];
-
-			// To get the array of addresses
-			for( int i = 0; i < to.length; i++ ) {
-				toAddress[i] = new InternetAddress(to[i]);
-			}
-
-			for( int i = 0; i < toAddress.length; i++) {
-				message.addRecipient(Message.RecipientType.TO, toAddress[i]);
-			}
-
-			message.setSubject(subject);  
-			message.setContent(body, "text/html");
-			Transport transport = session.getTransport("smtp");
-			transport.connect(server, from);
-			transport.sendMessage(message, message.getAllRecipients());
-			transport.close();
-			logger.info("Sent an E-Mail successfully....");
-		}
-		catch (AddressException ae) {
-			logger.info("Reading AddressException"+ae.getMessage());
-			ae.printStackTrace();
-		}
-		catch (MessagingException me) {
-			logger.info("Reading MessagingException:"+me.getMessage());
-			me.printStackTrace();
-		}
-
-
-
-	}
-	@Override
-	public void sendAnEmail(String serialNoIn, String serialNoOut,String emailMessageCode, String emailMessage) {
-		// TODO Auto-generated method stub
-		PropertyResourceBundle bundle = InitProperty.getProperty("pcbaMail.properties");
-
-		logger.info("logger information sendEmail start");
-		final String USER_NAME = bundle.getString("username");
-		final String server=bundle.getString("server");
-		final String portNO=bundle.getString("portNO");
-		final String RECIPIENT=bundle.getString("recipient");
-		String subject=bundle.getString("emailSubject");
-
-		String body=bundle.getString("emailBody");
-		body = MessageFormat.format(body, serialNoIn,serialNoOut,emailMessageCode,emailMessage);
-
-
-		String from = USER_NAME;
-		logger.info("from --------------------" + from);
-		String[] to = { RECIPIENT }; // list of recipient email addresses
-
-		Properties props = System.getProperties();
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", server);
-		props.put("mail.smtp.user", from);
-		props.put("mail.smtp.port", portNO);
-		props.put("mail.smtp.auth", "false");
-
-		Session session = Session.getDefaultInstance(props);
-		MimeMessage message = new MimeMessage(session);
-
-		try {
-			message.setFrom(new InternetAddress(from));
-			InternetAddress[] toAddress = new InternetAddress[to.length];
-
-			// To get the array of addresses
-			for( int i = 0; i < to.length; i++ ) {
-				toAddress[i] = new InternetAddress(to[i]);
-			}
-
-			for( int i = 0; i < toAddress.length; i++) {
-				message.addRecipient(Message.RecipientType.TO, toAddress[i]);
-			}
-
-			message.setSubject(subject);  
-			message.setContent(body, "text/html");
-			Transport transport = session.getTransport("smtp");
-			transport.connect(server, from);
-			transport.sendMessage(message, message.getAllRecipients());
-			transport.close();
-			logger.info("Sent an E-Mail successfully....");
-		}
-		catch (AddressException ae) {
-			logger.info("Reading AddressException"+ae.getMessage());
-			ae.printStackTrace();
-		}
-		catch (MessagingException me) {
-			logger.info("Reading MessagingException:"+me.getMessage());
-			me.printStackTrace();
-		}
-
-	}
 }

@@ -164,20 +164,20 @@ public class UPDSerialSuccessFailureRestWebservice {
 		}
 
 		if(pcbaProgramQueryInput.getSnType()!=null && pcbaProgramQueryInput.getSnType().trim().equals(PCBADataDictionary.IMEI)){
-			if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("S")){
+			if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("s")){
 				PCBAProgramResponse pCBAProgramResponseForIMEI = updSerialSuccessFailureInterfaceDAO.updateIMEIStatusSuccess(pcbaProgramQueryInput);
 				return Response.status(200).entity(pCBAProgramResponseForIMEI).build();
-			}else if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("F") || (pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("I"))){
+			}else{
 				PCBAProgramResponse pCBAProgramResponseForIMEI = updSerialSuccessFailureInterfaceDAO.updateIMEIStatusFailure(pcbaProgramQueryInput);
 				return Response.status(200).entity(pCBAProgramResponseForIMEI).build();
 
 			}
 
 		}else if(pcbaProgramQueryInput.getSnType()!=null && pcbaProgramQueryInput.getSnType().trim().equals(PCBADataDictionary.MEID)){
-			if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("S")){
+			if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("s")){
 				PCBAProgramResponse pcbaProgramResponseForMEID=updSerialSuccessFailureInterfaceDAO.updateMEIDStatusSuccess(pcbaProgramQueryInput);
 				return Response.status(200).entity(pcbaProgramResponseForMEID).build();
-			}else if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("F") || (pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase("I"))){
+			}else{
 				PCBAProgramResponse pcbaProgramResponseForMEID=updSerialSuccessFailureInterfaceDAO.updateMEIDStatusFailure(pcbaProgramQueryInput);
 				return Response.status(200).entity(pcbaProgramResponseForMEID).build();
 
@@ -191,7 +191,7 @@ public class UPDSerialSuccessFailureRestWebservice {
 
 	private boolean validateStatus(PCBAProgramQueryInput pcbaProgramQueryInput) {
 		// TODO Auto-generated method stub
-		if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase(PCBADataDictionary.STATUS_S) || pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase(PCBADataDictionary.STAYUS_F) || pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase(PCBADataDictionary.STAYUS_I)){
+		if(pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase(PCBADataDictionary.STATUS_S) || pcbaProgramQueryInput.getStatus().trim().equalsIgnoreCase(PCBADataDictionary.STAYUS_F)){
 			return true;
 		}
 		return false;
