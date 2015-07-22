@@ -802,8 +802,9 @@ PCBASwapUPDUpdateInterfaceDAO {
 						logger.info("serialNormalCase IMEIupdate SQL:"+serialIMEIupdate);
 
 						if (!status) {
-
-							String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR       "
+							// commented for pcba july 2015 release	
+							//String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR       "
+							String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='VOI       "
 									+ DateToStr
 									+ "',ATTRIBUTE_41='"+pCBASerialNoUPdateQueryInput.getSerialNoOut()+"',LAST_MOD_BY='pcba_pgm_SwapUpdate',LAST_MOD_DATETIME=sysdate where serial_no='"
 									+ pCBASerialNoUPdateQueryInput.getSerialNoIn()
@@ -1695,8 +1696,9 @@ PCBASwapUPDUpdateInterfaceDAO {
 				logger.info("serialIMEIupdate SQL:"+serialIMEIupdate);
 
 				if (!status) {
-
-					String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR       "
+					//Commentted for pcba july 2015 release
+					//String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='SCR       "
+					String updateOldserialNOStatus = "update upd.UPD_SN_REPOS set ATTRIBUTE_34='"+lockCode+"SCR',ATTRIBUTE_37='VOI       "
 							+ DateToStr
 							+ "',ATTRIBUTE_41='"+serialNoOut+"',LAST_MOD_BY='pcba_pgm_SwapUpdate',LAST_MOD_DATETIME=sysdate where serial_no='"
 							+ serialNoIn
@@ -1766,8 +1768,9 @@ PCBASwapUPDUpdateInterfaceDAO {
 				logger.info("Update Status SQL:"+SQLInnerQuery.toString());
 
 				if (!status) {
-
-					String updateOldserialNOStatus = "update upd.upd_sn_repos_ref set STATUS='SCR'  where serial_no='"
+					// Commentted code for pcba july 2015 release
+					//String updateOldserialNOStatus = "update upd.upd_sn_repos_ref set STATUS='SCR'  where serial_no='"
+					String updateOldserialNOStatus = "update upd.upd_sn_repos_ref set STATUS='VOI'  where serial_no='"
 							+ serialNoIn + "'";
 					pstmt1 = con.prepareStatement(updateOldserialNOStatus);
 					pstmt1.execute();
