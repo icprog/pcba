@@ -11,7 +11,7 @@ import java.util.Date;
  *
  */
 public class PCBASerialNoUPdateQueryInput implements Serializable{
-	
+
 	private String clientIP;
 	private String mascID;
 	private String serialNoIn;
@@ -32,8 +32,9 @@ public class PCBASerialNoUPdateQueryInput implements Serializable{
 	private String mktModel;
 	private String itemCode;
 	private String intelControlKey;
-	
-	
+	private String validation;
+
+
 	public String getClientIP() {
 		return clientIP;
 	}
@@ -154,7 +155,12 @@ public class PCBASerialNoUPdateQueryInput implements Serializable{
 	public void setIntelControlKey(String intelControlKey) {
 		this.intelControlKey = intelControlKey;
 	}
-	
-	
+	public String getValidation() {
+		return validation;
+	}
+	public void setValidation(String validation) {
+		this.validation = validation;
+	}
+
 
 }

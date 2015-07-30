@@ -99,7 +99,7 @@ public class ServiceMessageCodes {
 
 	public static final String MEID_SUCCES_MSG = "Success";
 	public static final String MEID_FAILURE_MSG = "pcba pgm failure";
-	public static final String INVALID_STATUS_MSG = "Status should be either S or F";
+	public static final String INVALID_STATUS_MSG = "Status should be Any one of these character(S,F or I)";
 	public static final String NO_LOCK_CODE_DETAILS_FOUND_MSG = "No Lock Code Details Found";
 	public static final String OLD_SERIAL_NO_NOT_FOUND_MSG = "Old SerialNO Not Found";
 	public static final String NEW_SERIAL_NO_NOT_FOUND_MSG = "New SerialNO Not Found";
@@ -113,7 +113,7 @@ public class ServiceMessageCodes {
 	public static final String DUAL_SERIAL_NOT_FOUND_MSG = "Required  DualSerialNoIn,DualSerialNoOut and DualSerialNoType.";
 	public static final String TRI_SERIAL_NOT_FOUND_MSG = "Required TriSerialNoIn,TriSerialNoOut,TriSerialNoType,DualSerialNoIn,DualSerialNoOut and DualSerialNoType.";
 	public static final String EMAIL_MSG_CODE = "8002";
-	public static final String EMAIL_MSG = "Error - Serial number is not active.Please Contact Support Team.";
+	public static final String EMAIL_MSG = "Error - Serial number is not active or BTL.Please Contact Support Team.";
 	public static final String DUAL_SERIAL_NO_CODE = "5022";
 	public static final String DUAL_SERIAL_NO_CODE_MSG = "This DualSerialNoIn is not eligible for Dual Case.";
 	public static final String TRI_SERIAL_NO_CODE = "5023";
@@ -142,12 +142,33 @@ public class ServiceMessageCodes {
 	public static final String REPAIREDATE_MSG="repaireDate can`t be balnk.";
 	public static final String TRI_SERIALNOTYPE_CODE="5036";
 	public static final String TRI_SERIALNOTYPE_MSG="TriSerialNoType should be either MEID or IMEI";
+	
+	//Added July 08 2015
+	public static final String IMEI_INTER_FAILURE = "5038";
+	public static final String IMEI_INTER_CODE_FAILURE = "5039";
+	public static final String VALIDATION_CODE="5040";
+	public static final String VALIDATION_MSG="validation Field can`t be balnk.";	
+	public static final String VALID_VALIDATION_CODE="5041";
+	public static final String VALID_VALIDATION_MSG="validation Field should be either YES or NO.";	
+	public static final String LOCK_CODE_MSG = "Lock Code updated successfully.i.e:  ";
+	public static final String LOCK_INTER_CODE_MSG = "Lock Codes are not updated. ";
 	public static final String SERIAL_NO_OUT_MSG_CODE="5031";
-	public static final String SERIAL_NO_OUT_MSG="serialNoOut status should be either VOI or ACT";
-	
-	
+	public static final String SERIAL_NO_OUT_MSG="serialNoOut status should be Any one of these VOI,ACT or BTL.";
+	public static final String GPP_ID_EMAIL_MSG_CODE = "8003";
+	public static final String GPP_ID_EMAIL_MSG = "Error - GPPD_ID is not matching with Serial_In and Serial_Out.Please Contact Support Team.";	
+	public static final String PROTOCOL_EMAIL_MSG_CODE = "8004";
+	public static final String PROTOCOL_EMAIL_MSG = "Error - Protocol is not matching with Serial_In and Serial_Out.Please Contact Support Team.";
+	public static final String MAC_ULMA_EMAIL_MSG_CODE = "8005";
+	//TODO
+	public static final String MAC_ULMA_EMAIL_MSG = "Error - Number Of ULMA and MAC Addresses are not matching with Serial_In and Serial_Out.Please Contact Support Team.";
 
-	
+	public static final String ULMA_MAC_EMAIL_MSG_CODE = "8006";
+	//TODO
+	public static final String ULMA_MAC_EMAIL_MSG = "Error - Number Of ULMA and MAC Addresses are not matching with Serial_Out and Serial_Out.Please Contact Support Team.";
+
+
+
+
 	// R12 scrap serial
 	public static final String OLD_SERIAL_FOUND_SUCCSS_MSG = "Success";
 	public static final String OLD_SN_SUCCESS = "0000";
