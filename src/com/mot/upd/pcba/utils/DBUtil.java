@@ -41,7 +41,9 @@ public class DBUtil {
 		try {
 			Context ctx = new InitialContext();
 			ds = (DataSource) ctx.lookup(jndiName);
+			logger.info("DBUtil Inside  DataSource method inside DataSource "+ds);
 		} catch (NamingException e) {
+			logger.info("DBUtil Inside  DataSource method inside DataSource1 "+ds);
 			throw e;
 		}
 
@@ -75,20 +77,19 @@ public class DBUtil {
 		String query = "select value from upd.upd_config where key = " +
 				"'"+ dbconfig + "'";
 		logger.info("updconfig query " + query);
-		PCBASerialNumberModel pCBASerialNumberModel = new PCBASerialNumberModel();
+		
 
 		try{
 
 			ds = DBUtil.getOracleDataSource();
+			logger.info("DataSource value : "+ds);
 			conn  = ds.getConnection();
 			System.out.println("connection " + conn);
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			while(rs.next()){
 				updConfig = rs.getString(1);
-
 			}
-
 		}catch(NamingException e){
 			throw e;
 		}catch(SQLException e){
@@ -99,10 +100,12 @@ public class DBUtil {
 		}
 		return updConfig;
 	}
+	
+	
 	public static Connection getConnection(DataSource ds) throws SQLException
 	{
 		logger.info("DBUtil Inside  Connection method inside");
-		PCBASerialNumberModel pCBASerialNumberModel = new PCBASerialNumberModel();
+		
 		Connection con = null;
 		try {
 			con = ds.getConnection();

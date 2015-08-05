@@ -345,9 +345,12 @@ public class UPDDispatchSerialRestWebservice {
 		dispatchSerialRequestPOJO = verifyCustomer(dispatchSerialRequestPOJO);
 
 		DispatchSerialNumberDAO dispatchSerialNumberDAO = null;
-		String updConfig = null;
+		//Added By Dharmendra Kumar Kaushal
+		//changed updConfig value as NO for MySQL support & if oracleJNDI is not present/configured in JBOSS server.
+		String updConfig = "NO";
 		try {
 			updConfig = DBUtil.dbConfigCheck();
+			logger.info("UpdConfig DB Check Status : "+updConfig);
 		} catch (NamingException e) {
 			dispatchSerialResponsePOJO
 					.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
@@ -363,11 +366,13 @@ public class UPDDispatchSerialRestWebservice {
 		}
 
 		// Oracle
-		if (updConfig.equals("YES")) {
+		if (updConfig.equals(PCBADataDictionary.DBCONFIG)) {
+			logger.info("Loading Oracle Database");
 			dispatchSerialNumberDAO = new DispatchSerialNumberOracleDAO();
 		}
 		// MySQL
 		else {
+			logger.info("Loading MySQL Database");
 			dispatchSerialNumberDAO = new DispatchSerialNumberMySQLDAO();
 		}
 

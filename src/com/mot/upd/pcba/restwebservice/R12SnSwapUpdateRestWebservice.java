@@ -57,7 +57,27 @@ public class R12SnSwapUpdateRestWebservice {
 			R12SnSwapOracleDAO r12SwapUpdateOraDAO = new R12SnSwapOracleDAO();
 			R12SnSwapMySQLDAO r12SwapUpdateMysqlDAO = new R12SnSwapMySQLDAO();
 			String serialSnCheckValue = DBUtil.checkValidSerialNumber(serialIn,"SerialIn");
-			String serialIndatabase = r12SwapUpdateOraDAO.checkSerialInDB(serialSnCheckValue);
+			
+			String serialIndatabase =null;
+			String updConfig = "NO";
+			try {
+                updConfig = DBUtil.dbConfigCheck();
+                logger.info("UpdConfig DB Check Status : "+updConfig);
+				} catch (NamingException e) {
+					r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
+					r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.NO_DATASOURCE_FOUND_DISPATCH_SERIAL_MSG
+                                                + e);
+				} catch (SQLException e) {
+					r12UpdateQueryResult.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
+					r12UpdateQueryResult.setResponseMsg(ServiceMessageCodes.NO_DATASOURCE_FOUND_DISPATCH_SERIAL_MSG
+                                                + e);
+				}
+
+			if(updConfig.equals(PCBADataDictionary.DBCONFIG)){
+				 serialIndatabase = r12SwapUpdateOraDAO.checkSerialInDB(serialSnCheckValue);
+			}else{
+				serialIndatabase = r12SwapUpdateMysqlDAO.checkSerialInDB(serialSnCheckValue);
+			}
 			//String serialSnCheckValue = MeidUtils.validateMEID(serialIn);
 			logger.info(" serial available in db  = " + serialIndatabase);
 			logger.info(" Request serialIn value from after check process  = " + serialSnCheckValue);
@@ -65,7 +85,7 @@ public class R12SnSwapUpdateRestWebservice {
 			if(serialSnCheckValue!=null && serialSnCheckValue.length()==ServiceMessageCodes.SN_15_DIGIT){
 				//PCBASerialNumberModel pCBASerialNumberModel = r12SwapUpdateDAO.fetchR12SerialOutValue(r12UpdateQueryInput.getSerialNO());
 				if(serialIndatabase !=null && serialIndatabase !=""){
-				String updConfig = DBUtil.dbConfigCheck();
+				
 				logger.info("updConfig value : = " + updConfig);
 				if(updConfig.equals(PCBADataDictionary.DBCONFIG)){
 					 pCBASerialNumberModel = r12SwapUpdateOraDAO.fetchOldestSCROracleValue(serialSnCheckValue);

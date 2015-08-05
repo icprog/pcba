@@ -72,9 +72,9 @@ public class R12SnSwapMySQLDAO {
 				pstmt.setString(1, serialIn);
 				
 				rs = pstmt.executeQuery();
-				HashMap<String, String> map = new  HashMap();
+				HashMap<String, String> map = new HashMap();
 				while(rs.next()){
-					map.put(rs.getString(1), rs.getString(2));
+						map.put(rs.getString(1), rs.getString(2));
 				}
 				Map<String,String> returnedMap1 = checkOldKey(map, serialIn);
                 if(returnedMap1.get("VALUE_FOUND").equals("YES")) {
@@ -129,5 +129,38 @@ public class R12SnSwapMySQLDAO {
         return resultMap;
 
 	 }
+	 public static String checkSerialInDB(String serialIn) throws NamingException, SQLException{
+
+			DataSource ds = null;
+			Connection conn = null;
+			Statement stmt = null;
+			ResultSet rs = null;
+			String serialNo = null;
+			String query = "select * from upd.upd_factory_shipment_info where serial_no = " +
+					"'"+ serialIn + "'";
+			logger.info("serial availablity check query " + query);
+			
+			try{
+
+				ds = DBUtil.getMySqlDataSource();
+				conn  = ds.getConnection();
+				System.out.println("connection " + conn);
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery(query);
+				while(rs.next()){
+					serialNo = rs.getString(1);
+				}
+
+			}catch(NamingException e){
+				throw e;
+			}catch(SQLException e){
+				throw e;
+			}finally{
+
+				DBUtil.closeConnections(conn, stmt, rs);
+			}
+			logger.info("serial available in mysql db   " + serialNo);
+			return serialNo;
+		}
 
 }

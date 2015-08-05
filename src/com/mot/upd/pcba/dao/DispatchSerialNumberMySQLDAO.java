@@ -46,7 +46,8 @@ public class DispatchSerialNumberMySQLDAO implements DispatchSerialNumberDAO {
 		logger.info("DispatchSerialNumberOracleDAO:Entered Method validateCustomerIMEI");
 		try {
 
-			ds = DBUtil.getOracleDataSource();
+			//ds = DBUtil.getOracleDataSource();
+			ds = DBUtil.getMySqlDataSource();
 		} catch (NamingException e) {
 			logger.error(e.getMessage());
 			response.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
@@ -115,7 +116,8 @@ public class DispatchSerialNumberMySQLDAO implements DispatchSerialNumberDAO {
 		logger.info("DispatchSerialNumberOracleDAO:Entered Method validateCustomerIMEI");
 		try {
 
-			ds = DBUtil.getOracleDataSource();
+			//ds = DBUtil.getOracleDataSource();
+			ds = DBUtil.getMySqlDataSource();
 		} catch (NamingException e) {
 			logger.error(e.getMessage());
 			response.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
@@ -183,7 +185,8 @@ public class DispatchSerialNumberMySQLDAO implements DispatchSerialNumberDAO {
 		logger.info("DispatchSerialNumberOracleDAO:Entered Method validateGPPIDIMEI");
 		try {
 
-			ds = DBUtil.getOracleDataSource();
+			//ds = DBUtil.getOracleDataSource();
+			ds = DBUtil.getMySqlDataSource();
 		} catch (NamingException e) {
 			logger.error(e.getMessage());
 			response.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
@@ -252,7 +255,8 @@ public class DispatchSerialNumberMySQLDAO implements DispatchSerialNumberDAO {
 		logger.info("DispatchSerialNumberOracleDAO:Entered Method validateGPPIDMEID");
 		try {
 
-			ds = DBUtil.getOracleDataSource();
+			//ds = DBUtil.getOracleDataSource();
+			ds = DBUtil.getMySqlDataSource();
 		} catch (NamingException e) {
 			logger.error(e.getMessage());
 			response.setResponseCode(ServiceMessageCodes.NO_DATASOURCE_FOUND);
