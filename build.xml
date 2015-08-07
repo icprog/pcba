@@ -29,7 +29,7 @@
     <target name="war" depends="compile">
         <war destfile="${warDestination}/${warFileName}" webxml="${webxmlPath}">
             <fileset dir="${parentWebPath}"/>
-            <lib dir="${libPath}"/>
+            <!--<lib dir="${libPath}"/>-->
             <classes dir="${warDestination}/build/classes"/>
         </war>
         <echo>You are done with creating war, location:${warDestination}/${warFileName}.</echo>
