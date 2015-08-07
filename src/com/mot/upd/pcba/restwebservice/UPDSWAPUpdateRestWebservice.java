@@ -51,7 +51,8 @@ public class UPDSWAPUpdateRestWebservice {
 		boolean isValidation =false;
 		boolean isTriSerialNoType=false;
 
-		String updConfig = null;
+		//String updConfig = null;
+		String updConfig = PCBADataDictionary.UPDCONFIG;;
 		try {
 			updConfig = DBUtil.dbConfigCheck();
 		}catch (NamingException e) {
@@ -64,7 +65,7 @@ public class UPDSWAPUpdateRestWebservice {
 		}
 		PCBASwapUPDUpdateInterfaceDAO pcbaSwapUPDUpdateInterfaceDAO =null;
 
-		if(updConfig!=null && updConfig.equals("YES")){
+		if(updConfig!=null && updConfig.equals(PCBADataDictionary.DBCONFIG)){
 			pcbaSwapUPDUpdateInterfaceDAO = new PCBASwapUPDUpdateOracleDAO();
 		}else{
 			pcbaSwapUPDUpdateInterfaceDAO = new PCBASwapUPDUpdateSQLDAO();
@@ -138,7 +139,7 @@ public class UPDSWAPUpdateRestWebservice {
 			return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
 
 		}
-		// added one more mandatory field validation on july 2015
+		// added one more mandatory field validation on 08 july 2015
 		isValidValidation = ValidValidation(pCBASerialNoUPdateQueryInput);
 		if(isValidValidation){
 			pcbaSerialNoUPdateResponse.setResponseCode(ServiceMessageCodes.VALIDATION_CODE);
@@ -153,43 +154,6 @@ public class UPDSWAPUpdateRestWebservice {
 			return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
 		}
 
-		//GPP_ID Validation For IMEI Start From 08 July 2015 for Normal case
-		String serialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getSerialNoIn());
-
-		if((serialNoStatus != null && serialNoStatus.startsWith("ACT")) || (serialNoStatus != null && serialNoStatus.startsWith("BTL"))){
-
-			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
-					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
-					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
-
-				if(pCBASerialNoUPdateQueryInput.getSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getSerialNoType().equals("IMEI")){
-					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
-					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-					}
-
-				}
-
-				if(pCBASerialNoUPdateQueryInput.getSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getSerialNoType().equals("MEID")){
-					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateProtocol(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
-					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-					}
-				}
-
-			}
-			// Calculate no of mac address for SerialNoIn and SerialNoOut for Normal Case
-
-			if((pCBASerialNoUPdateQueryInput.getSerialNoIn()!=null && !pCBASerialNoUPdateQueryInput.getSerialNoIn().equals("")) && 
-					(pCBASerialNoUPdateQueryInput.getSerialNoOut()!=null && !pCBASerialNoUPdateQueryInput.getSerialNoOut().equals(""))){
-				pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.calculateNoOfMACAddressForNormalCase(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
-
-				/*if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-				return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-			    }*/
-
-			}
-		}
 		//Check SerialIn and SerialOut different
 		isValidSerialIn=validateNormalSerialNoIn(pCBASerialNoUPdateQueryInput);
 		if(!isValidSerialIn){
@@ -220,47 +184,6 @@ public class UPDSWAPUpdateRestWebservice {
 			}
 
 		}
-
-		// Dual Case July 08 2015
-		String dualSerialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getDualSerialNoIn());
-
-		if((dualSerialNoStatus != null && dualSerialNoStatus.startsWith("ACT")) || (dualSerialNoStatus != null && dualSerialNoStatus.startsWith("BTL"))){
-
-			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
-					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
-					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
-
-				if(pCBASerialNoUPdateQueryInput.getDualSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getDualSerialNoType().equals("IMEI")){
-					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getDualSerialNoIn(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut());
-					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-					}
-
-				}
-
-				if(pCBASerialNoUPdateQueryInput.getDualSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getDualSerialNoType().equals("MEID")){
-					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateProtocol(pCBASerialNoUPdateQueryInput.getDualSerialNoIn(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut());
-					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-					}
-
-				}
-
-			}
-
-			// Calculate no of mac address for SerialNoIn and SerialNoOut for Dual SIM Case
-
-			if((pCBASerialNoUPdateQueryInput.getDualSerialNoIn()!=null && !pCBASerialNoUPdateQueryInput.getDualSerialNoIn().equals("")) && 
-					(pCBASerialNoUPdateQueryInput.getDualSerialNoOut()!=null && !pCBASerialNoUPdateQueryInput.getDualSerialNoOut().equals(""))){
-				pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.calculateNoOfMACAddress(pCBASerialNoUPdateQueryInput.getSerialNoOut(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut(),null);
-
-				/*if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-				return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-			   }*/
-
-			}
-		}
-
 
 		// Check SerialIn,SerialOut,DualSerialNoIn,DualSerialNoOut,TriSerialNoIn and TriSerialNoOut are Different
 		isValidTriSerialIn = validateTriSerialNoIn(pCBASerialNoUPdateQueryInput);
@@ -363,44 +286,6 @@ public class UPDSWAPUpdateRestWebservice {
 			}
 		}
 
-		// Tri Sim  Case July 08 2015
-		String triSerialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getTriSerialNoIn());
-
-		if((triSerialNoStatus != null && triSerialNoStatus.startsWith("ACT")) || (triSerialNoStatus != null && triSerialNoStatus.startsWith("BTL"))){
-
-			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
-					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
-					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
-
-				if(pCBASerialNoUPdateQueryInput.getTriSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getTriSerialNoType().equals("IMEI")){
-					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),pCBASerialNoUPdateQueryInput.getTriSerialNoOut());
-					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-					}
-
-				}
-
-				if(pCBASerialNoUPdateQueryInput.getTriSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getTriSerialNoType().equals("MEID")){
-					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateProtocol(pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),pCBASerialNoUPdateQueryInput.getTriSerialNoOut());
-					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-					}
-				}
-			}
-
-			// Calculate no of mac address for SerialNoIn and SerialNoOut for Tri SIM Case
-
-			if((pCBASerialNoUPdateQueryInput.getTriSerialNoIn()!=null && !pCBASerialNoUPdateQueryInput.getTriSerialNoIn().equals("")) && 
-					(pCBASerialNoUPdateQueryInput.getTriSerialNoOut()!=null && !pCBASerialNoUPdateQueryInput.getTriSerialNoOut().equals(""))){
-				pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.calculateNoOfMACAddress(pCBASerialNoUPdateQueryInput.getSerialNoOut(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut(),pCBASerialNoUPdateQueryInput.getTriSerialNoOut());
-
-				/*if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
-				return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
-			   }*/
-
-			}
-		}
-
 		if(pCBASerialNoUPdateQueryInput.getTriSerialNoIn()!=null &&!(pCBASerialNoUPdateQueryInput.getTriSerialNoIn().equals(""))){
 			int triSerialCount = pcbaSwapUPDUpdateInterfaceDAO.checkValidSerialNoIn(pCBASerialNoUPdateQueryInput.getTriSerialNoIn());
 			if(triSerialCount!=3){
@@ -415,8 +300,127 @@ public class UPDSWAPUpdateRestWebservice {
 		}
 
 
-		PCBASerialNoUPdateResponse response = pcbaSwapUPDUpdateInterfaceDAO.serialNumberInfo(pCBASerialNoUPdateQueryInput);
 
+		//GPP_ID Validation For IMEI Start From 08 July 2015 for Normal case
+		String serialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getSerialNoIn());
+
+		if((serialNoStatus != null && serialNoStatus.startsWith("ACT")) || (serialNoStatus != null && serialNoStatus.startsWith("BTL"))){
+
+			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
+					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
+					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
+
+				// GPPID Validation for IMEI Normal Case
+
+				if(pCBASerialNoUPdateQueryInput.getSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getSerialNoType().equals("IMEI")){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
+					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					}
+				}
+
+				//Protocol validation for MEID Normal Case
+
+				if(pCBASerialNoUPdateQueryInput.getSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getSerialNoType().equals("MEID")){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateProtocol(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
+					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					}
+				}
+
+				// Calculate no of mac address for SerialNoIn and SerialNoOut for Normal Case
+
+				if((pCBASerialNoUPdateQueryInput.getSerialNoIn()!=null && !pCBASerialNoUPdateQueryInput.getSerialNoIn().equals("")) && 
+						(pCBASerialNoUPdateQueryInput.getSerialNoOut()!=null && !pCBASerialNoUPdateQueryInput.getSerialNoOut().equals(""))){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.calculateNoOfMACAddressForNormalCase(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
+
+					/*if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					    }*/
+				}
+
+			}
+		}
+
+
+		// Dual Case GPPID Validation July 08 2015
+		String dualSerialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getDualSerialNoIn());
+
+		if((dualSerialNoStatus != null && dualSerialNoStatus.startsWith("ACT")) || (dualSerialNoStatus != null && dualSerialNoStatus.startsWith("BTL"))){
+
+			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
+					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
+					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
+
+				//GPPID validation for IMEI Dual SIM Case
+				if(pCBASerialNoUPdateQueryInput.getDualSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getDualSerialNoType().equals("IMEI")){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getDualSerialNoIn(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut());
+					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					}
+				}
+
+				//Protocol validation for MEID Dual SIM Case
+				if(pCBASerialNoUPdateQueryInput.getDualSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getDualSerialNoType().equals("MEID")){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateProtocol(pCBASerialNoUPdateQueryInput.getDualSerialNoIn(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut());
+					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					}
+				}			
+
+				// Calculate no of mac address for SerialNoIn and SerialNoOut for Dual SIM Case
+				if((pCBASerialNoUPdateQueryInput.getDualSerialNoIn()!=null && !pCBASerialNoUPdateQueryInput.getDualSerialNoIn().equals("")) && 
+						(pCBASerialNoUPdateQueryInput.getDualSerialNoOut()!=null && !pCBASerialNoUPdateQueryInput.getDualSerialNoOut().equals(""))){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.calculateNoOfMACAddress(pCBASerialNoUPdateQueryInput.getSerialNoOut(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut(),null);
+
+					/*if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					   }*/
+				}
+
+			}
+		}
+
+		// Tri Sim  Case GPPID Validation July 08 2015
+		String triSerialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getTriSerialNoIn());
+
+		if((triSerialNoStatus != null && triSerialNoStatus.startsWith("ACT")) || (triSerialNoStatus != null && triSerialNoStatus.startsWith("BTL"))){
+
+			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
+					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
+					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
+
+				// GPPID Validation for IMEI Tri SIM Case
+				if(pCBASerialNoUPdateQueryInput.getTriSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getTriSerialNoType().equals("IMEI")){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),pCBASerialNoUPdateQueryInput.getTriSerialNoOut());
+					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					}
+				}
+
+				//Protocol Validation for MEID Tri SIM Case
+				if(pCBASerialNoUPdateQueryInput.getTriSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getTriSerialNoType().equals("MEID")){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateProtocol(pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),pCBASerialNoUPdateQueryInput.getTriSerialNoOut());
+					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+					}
+				}
+
+				// Calculate no of mac address for SerialNoIn and SerialNoOut for Tri SIM Case
+
+				if((pCBASerialNoUPdateQueryInput.getTriSerialNoIn()!=null && !pCBASerialNoUPdateQueryInput.getTriSerialNoIn().equals("")) && 
+						(pCBASerialNoUPdateQueryInput.getTriSerialNoOut()!=null && !pCBASerialNoUPdateQueryInput.getTriSerialNoOut().equals(""))){
+					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.calculateNoOfMACAddress(pCBASerialNoUPdateQueryInput.getSerialNoOut(),pCBASerialNoUPdateQueryInput.getDualSerialNoOut(),pCBASerialNoUPdateQueryInput.getTriSerialNoOut());
+
+					/*if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
+				return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
+			   }*/
+				}
+
+			}
+		}
+
+		PCBASerialNoUPdateResponse response = pcbaSwapUPDUpdateInterfaceDAO.serialNumberInfo(pCBASerialNoUPdateQueryInput);
 
 		return Response.status(200).entity(response).build();
 

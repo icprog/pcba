@@ -59,7 +59,7 @@ public class R12SnSwapUpdateRestWebservice {
 			String serialSnCheckValue = DBUtil.checkValidSerialNumber(serialIn,"SerialIn");
 			
 			String serialIndatabase =null;
-			String updConfig = "NO";
+			String updConfig = PCBADataDictionary.UPDCONFIG;
 			try {
                 updConfig = DBUtil.dbConfigCheck();
                 logger.info("UpdConfig DB Check Status : "+updConfig);

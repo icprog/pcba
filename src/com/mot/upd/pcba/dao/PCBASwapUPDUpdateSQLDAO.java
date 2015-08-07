@@ -14,6 +14,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+
 import com.mot.upd.pcba.constants.ServiceMessageCodes;
 import com.mot.upd.pcba.pojo.PCBASerialNoUPdateQueryInput;
 import com.mot.upd.pcba.pojo.PCBASerialNoUPdateResponse;
@@ -76,20 +77,16 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 				con1 = DBUtil.getConnection(ds);
 				con1.setAutoCommit(false);
 
-
-				String serialNoStatus=rs.getString("status_code");	
-
-				if(!serialNoStatus.startsWith("ACT")){
-
-					sendEmail(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut(),con1,prestmt);
-					response.setResponseCode(ServiceMessageCodes.EMAIL_MSG_CODE);
-					response.setResponseMessage(ServiceMessageCodes.EMAIL_MSG);
-					con1.commit();
-
-				}else{				
-
-
-					String MySql_updFactoryShipmentInfo = "update upd.upd_factory_shipment_info set factory_code=?,gen_date=?,protocol=?,apc=?,trans_model=?,cust_model=?,mkt_model=?,item_code=?,warr_code=?,"
+				String serialOutStatus = getStatus(pCBASerialNoUPdateQueryInput.getSerialNoOut());
+				//String serialNoStatus=rs.getString("status_code");	
+				logger.info("serialOutStatus +++++ " + serialOutStatus);
+				if((serialOutStatus!=null && serialOutStatus.startsWith("VOI")) || 
+						(serialOutStatus!=null && serialOutStatus.startsWith("ACT")) ||
+						(serialOutStatus!=null && serialOutStatus.startsWith("BTL"))){	
+						
+						String serialNoStatus=rs.getString("status_code");
+						if((serialNoStatus != null && serialNoStatus.startsWith("ACT")) || (serialNoStatus != null && serialNoStatus.startsWith("BTL"))){
+							String MySql_updFactoryShipmentInfo = "update upd.upd_factory_shipment_info set factory_code=?,gen_date=?,protocol=?,apc=?,trans_model=?,cust_model=?,mkt_model=?,item_code=?,warr_code=?,"
 							+ "ship_date=?,ship_to_cust_id=?,ship_to_cust_addr=?,ship_to_cust_name=?,ship_to_cust_city=?,ship_to_cust_country=?,sold_to_cust_id=?,sold_to_cust_name=?,sold_date=?,"
 							+ "cit=?,ta_no=?,carton_id=?,po_no=?,so_no=?,fo_sequence=?,msn=?,assign_date=?,gpp_id=?,product_type=?,location_type=?,packing_list=?,fab_date=?,imc_mfg_location=?,"
 							+ "guid=?,pdb_id=?,last_mod_datetime=now(),last_mod_by='pcba_pgm_SwapUpdate' where serial_no=?";
@@ -479,9 +476,18 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 					Date curDate = new Date();
 					SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy");
 					String DateToStr = format.format(curDate);
+					//July enhancement fix
+					if(serialNoStatus!=null && serialNoStatus.startsWith("ACT")){
+						pstmt1.setString(1, "ACT       " + DateToStr);// Status
+						logger.info("1111111111111");
+					}
 
+					if(serialNoStatus!=null && serialNoStatus.startsWith("BTL")){
+						pstmt1.setString(1, "BTL       " + DateToStr);// Status
+						logger.info("22222222222222222");
+					}
 
-					pstmt1.setString(1, "ACT       " + DateToStr);
+					//pstmt1.setString(1, "ACT       " + DateToStr);
 
 					if(rs.getString("orig_warr_eff_date")!=null && !(rs.getString("orig_warr_eff_date").equals(""))){
 						pstmt1.setString(2, rs.getString("orig_warr_eff_date"));
@@ -816,8 +822,9 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 
 					if (!status1 && !status2 && !status3 && !status4 && !status5
 							&& !status6 && !status7) {
-
-						String statusCode = "SCR       " + DateToStr;
+						//July enhancement fix for SCR to VOI
+					//	String statusCode = "SCR       " + DateToStr;
+						String statusCode = "VOI       " + DateToStr;
 
 						String statusUpdatingOldSerialNo = "update upd.upd_warranty_info set status_code='"+ statusCode+ "',last_mod_datetime=now(),last_mod_by='pcba_pgm_SwapUpdate' where serial_no='"+pCBASerialNoUPdateQueryInput.getSerialNoIn()+"'";
 						pstmt1 = con1.prepareStatement(statusUpdatingOldSerialNo);
@@ -837,15 +844,18 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 
 					response.setResponseCode(ServiceMessageCodes.OLD_SN_SUCCESS);
 					response.setResponseMessage(ServiceMessageCodes.OLD_SERIAL_FOUND_SUCCSS_MSG);
+				
+						}else{
+						sendEmail(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut(),con1,prestmt);
+						response.setResponseCode(ServiceMessageCodes.EMAIL_MSG_CODE);
+						response.setResponseMessage(ServiceMessageCodes.EMAIL_MSG);
+						con1.commit();
+					}
+				}else{
+					response.setResponseCode(ServiceMessageCodes.SERIAL_NO_OUT_MSG_CODE);
+					response.setResponseMessage(ServiceMessageCodes.SERIAL_NO_OUT_MSG);
+
 				}
-
-			} else {
-
-				response.setResponseCode(ServiceMessageCodes.OLD_SERIAL_NO_NOT_FOUND_IN_SHIPMENT_TABLE);
-				response.setResponseMessage(ServiceMessageCodes.OLD_SERIAL_NO_NOT_FOUND_IN_SHIPMENT_TABLE_MSG);
-				return response;
-
-			}
 			// Above its normal case
 
 			// Dual Case
@@ -856,7 +866,7 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 
 					String DualStatus = getStatus(pCBASerialNoUPdateQueryInput.getDualSerialNoIn());
 
-					if(DualStatus!=null && DualStatus.startsWith("ACT")){
+					if(DualStatus!=null && DualStatus.startsWith("ACT")||DualStatus!=null && DualStatus.startsWith("BTL")){
 
 						con1 = updateReferenceTable(
 								pCBASerialNoUPdateQueryInput.getSerialNoIn(),
@@ -865,7 +875,7 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 						con1 = updateBasedOnSerial(
 								pCBASerialNoUPdateQueryInput.getDualSerialNoIn(),
 								pCBASerialNoUPdateQueryInput.getDualSerialNoOut(),
-								ds, con1);
+								ds, con1,DualStatus);
 
 						con1 = updateReferenceTable(
 								pCBASerialNoUPdateQueryInput.getDualSerialNoIn(),
@@ -894,7 +904,7 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 						con1 = updateBasedOnSerial(
 								pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),
 								pCBASerialNoUPdateQueryInput.getTriSerialNoOut(),
-								ds, con1);
+								ds, con1,triStatus);
 						con1 = updateReferenceTable(
 								pCBASerialNoUPdateQueryInput.getTriSerialNoIn(),
 								pCBASerialNoUPdateQueryInput.getTriSerialNoOut(),
@@ -910,7 +920,7 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 				}
 			}
 			con1.commit();
-
+			}
 		} catch (Exception e) {
 			try {
 				con1.rollback();
@@ -935,7 +945,7 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 	}
 
 	public Connection updateBasedOnSerial(String serialNoIn,
-			String serialNoOut, DataSource ds, Connection connection2)
+			String serialNoOut, DataSource ds, Connection connection2, String dualTriStatus)
 					throws Exception {
 
 		Connection innerselectcon = null;
@@ -1354,10 +1364,11 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 				Date curDate = new Date();
 				SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyy");
 				String DateToStr = format.format(curDate);
-
-
+				if(dualTriStatus!=null && dualTriStatus.startsWith("ACT")){
 				pstmt1.setString(1, "ACT       " + DateToStr);
-
+				}else if(dualTriStatus!=null && dualTriStatus.startsWith("BTL")){
+					pstmt1.setString(1, "BTL       " + DateToStr);
+				}
 				if(rs.getString("orig_warr_eff_date")!=null && !(rs.getString("orig_warr_eff_date").equals(""))){
 					pstmt1.setString(2, rs.getString("orig_warr_eff_date"));
 				}else{
@@ -1692,8 +1703,9 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 
 				if (!status1 && !status2 && !status3 && !status4 && !status5
 						&& !status6 && !status7) {
-					String statusCode = "SCR       " + DateToStr;
-
+					//July Enhancement fix for SCR to VOI
+					//String statusCode = "SCR       " + DateToStr;
+					  String statusCode = "VOI       " + DateToStr;	
 					String statusUpdatingOldSerialNo = "update upd.upd_warranty_info set status_code='"+ statusCode+ "',last_mod_datetime=now(),last_mod_by='pcba_pgm_SwapUpdate' where serial_no='"+serialNoIn+"'";
 					pstmt1 = connection2.prepareStatement(statusUpdatingOldSerialNo);
 					pstmt1.execute();
@@ -1761,8 +1773,9 @@ public class PCBASwapUPDUpdateSQLDAO implements PCBASwapUPDUpdateInterfaceDAO {
 				boolean status = pstUpdate.execute();
 
 				if (!status) {
-
-					String updateOldserialNOStatus = "update upd.upd_sn_repos_ref set STATUS='SCR'  where serial_no='"+ serialNoIn + "'";
+					//July Enhancement change SCR to VOI
+					//String updateOldserialNOStatus = "update upd.upd_sn_repos_ref set STATUS='SCR'  where serial_no='"+ serialNoIn + "'";
+					String updateOldserialNOStatus = "update upd.upd_sn_repos_ref set STATUS='VOI'  where serial_no='"+ serialNoIn + "'";
 					pstmt1 = con.prepareStatement(updateOldserialNOStatus);
 					pstmt1.execute();
 

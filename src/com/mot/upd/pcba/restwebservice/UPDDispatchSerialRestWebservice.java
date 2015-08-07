@@ -347,7 +347,7 @@ public class UPDDispatchSerialRestWebservice {
 		DispatchSerialNumberDAO dispatchSerialNumberDAO = null;
 		//Added By Dharmendra Kumar Kaushal
 		//changed updConfig value as NO for MySQL support & if oracleJNDI is not present/configured in JBOSS server.
-		String updConfig = "NO";
+		String updConfig = PCBADataDictionary.UPDCONFIG;
 		try {
 			updConfig = DBUtil.dbConfigCheck();
 			logger.info("UpdConfig DB Check Status : "+updConfig);

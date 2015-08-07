@@ -42,7 +42,8 @@ public class UPDSerialSuccessFailureRestWebservice {
 		PCBAProgramResponse pcbaProgramResponse = new PCBAProgramResponse();
 		UPDSerialSuccessFailureInterfaceDAO updSerialSuccessFailureInterfaceDAO =null;
 
-		String updConfig = null;
+		//String updConfig = null;
+		String updConfig = PCBADataDictionary.UPDCONFIG;
 		try {
 			updConfig = DBUtil.dbConfigCheck();
 		}catch (NamingException e) {		
@@ -53,7 +54,7 @@ public class UPDSerialSuccessFailureRestWebservice {
 			pcbaProgramResponse.setResponseMessage(ServiceMessageCodes.NO_DATASOURCE_FOUND_DISPATCH_SERIAL_MSG + e);
 		}
 
-		if(updConfig!=null && updConfig.equals("YES")){
+		if(updConfig!=null && updConfig.equals(PCBADataDictionary.DBCONFIG)){
 			updSerialSuccessFailureInterfaceDAO = new UPDSerialSuccessFailureOracleDAO();
 
 		}else{

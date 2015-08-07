@@ -106,8 +106,8 @@ public class ServiceMessageCodes {
 	public static final String NO_DATASOURCE_FOUND_FOR_SERIAL_NO_MSG = "No DataSource found for SerialNO.";
 	public static final String IMEI_SUCCES_MSG = "Success";
 	public static final String IMEI_FAILURE_MSG = "pcba pgm failure";
-	public static final String PCBA_INPUT_PARAM_SERIAL_NO_MSG = "serialno can`t be balnk.";
-	public static final String PCBA_INPUT_PARAM_MISSING = "serialNoIn can`t be balnk.";
+	public static final String PCBA_INPUT_PARAM_SERIAL_NO_MSG = "serialno can`t be blank.";
+	public static final String PCBA_INPUT_PARAM_MISSING = "serialNoIn can`t be blank.";
 	public static final String OLD_SERIAL_NO_NOT_FOUND_IN_SHIPMENT_TABLE_MSG = "Old Serialno not found in Shipment table";
 	public static final String OLD_SERIAL_NO_NOT_FOUND_IN_WARRANTY_INFO_TABLE_MSG = "Old Serialno not found in warranty info table";
 	public static final String DUAL_SERIAL_NOT_FOUND_MSG = "Required  DualSerialNoIn,DualSerialNoOut and DualSerialNoType.";
@@ -127,19 +127,19 @@ public class ServiceMessageCodes {
 	public static final String TRI_SERIAL_IN_OUT_DIFF="5028";
 	public static final String TRI_SERIAL_IN_OUT_DIFF_MSG="SerialNoIn,SreialNoOut,DualSerialNoIn,DualSerialNoOut,TriSerialNoIn and TriSerialNoOut should different";
 	public static final String SNTYPE_CODE="5029";
-	public static final String SNTYPE_MSG="snType can`t be balnk.";
+	public static final String SNTYPE_MSG="snType can`t be blank.";
 	public static final String STATUS_CODE="5030";
-	public static final String STATUS_MSG="status can`t be balnk.";
+	public static final String STATUS_MSG="status can`t be blank.";
 	//public static final String MANDATORY_STATUS_CODE="5031";
 	//public static final String MANDATORY_STATUS_MSG="Any of msl,otksl,servicePassCode is mandatory";
 	public static final String MANDATORY_SERIALNO_IN_CODE="5032";
 	public static final String SERIALNOTYPE_CODE="5033";
-	public static final String SERIALNOTYPE_MSG="serialNoType can`t be balnk.";
-	public static final String SERIALNOOUT_MSG="serialNoOut can`t be balnk.";
+	public static final String SERIALNOTYPE_MSG="serialNoType can`t be blank.";
+	public static final String SERIALNOOUT_MSG="serialNoOut can`t be blank.";
 	public static final String DUAL_SERIALNOTYPE_CODE="5034";
 	public static final String DUAL_SERIALNOTYPE_MSG="dualSerialNoType should be either MEID or IMEI";
 	public static final String REPAIREDATE_CODE="5035";
-	public static final String REPAIREDATE_MSG="repaireDate can`t be balnk.";
+	public static final String REPAIREDATE_MSG="repaireDate can`t be blank.";
 	public static final String TRI_SERIALNOTYPE_CODE="5036";
 	public static final String TRI_SERIALNOTYPE_MSG="TriSerialNoType should be either MEID or IMEI";
 	
@@ -147,7 +147,7 @@ public class ServiceMessageCodes {
 	public static final String IMEI_INTER_FAILURE = "5038";
 	public static final String IMEI_INTER_CODE_FAILURE = "5039";
 	public static final String VALIDATION_CODE="5040";
-	public static final String VALIDATION_MSG="validation Field can`t be balnk.";	
+	public static final String VALIDATION_MSG="validation Field can`t be blank.";	
 	public static final String VALID_VALIDATION_CODE="5041";
 	public static final String VALID_VALIDATION_MSG="validation Field should be either YES or NO.";	
 	public static final String LOCK_CODE_MSG = "Lock Code updated successfully.i.e:  ";

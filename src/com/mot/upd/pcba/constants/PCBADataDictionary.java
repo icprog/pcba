@@ -27,5 +27,6 @@ public class PCBADataDictionary {
 	public static final String IMEI_ATTRIBUTE="GSM";
 	public static final String YES="YES";
 	public static final String NO="NO";
+	public static final String UPDCONFIG = "NO";
 
 }

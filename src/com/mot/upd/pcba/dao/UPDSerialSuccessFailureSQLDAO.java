@@ -139,7 +139,15 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 			con.setAutoCommit(false);
 
 			StringBuffer IMEIStatusFailure_SQL=new StringBuffer();
-			IMEIStatusFailure_SQL.append("update upd.upd_lock_code  set LAST_MOD_BY='pcba_pgm_failure',");
+			//july2015 enhancement for intermediate update 
+			String status ="";
+			if(pcbaProgramQueryInput.getStatus()!=null && !pcbaProgramQueryInput.getStatus().equals("") && pcbaProgramQueryInput.getStatus().equals("F")){
+				status ="pcba_pgm_failure";
+			}else if(pcbaProgramQueryInput.getStatus()!=null && !pcbaProgramQueryInput.getStatus().equals("") && pcbaProgramQueryInput.getStatus().equals("I")){
+				status ="pcba_pgm_Update(I)";
+			}
+			//july2015 enhancement for intermediate update 
+			IMEIStatusFailure_SQL.append("update upd.upd_lock_code  set LAST_MOD_BY='"+status+"',");
 
 			// ATTRIBUTE_25
 			if(pcbaProgramQueryInput.getMsl()!=null && !(pcbaProgramQueryInput.getMsl().equals(""))){
@@ -171,24 +179,61 @@ public class UPDSerialSuccessFailureSQLDAO implements UPDSerialSuccessFailureInt
 			logger.info("IMEI Status Failure handsetType SQL Query :"+handsetType);
 
 			pstmt=null;
-
-			String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			//july2015 enhancement for intermediate update 
+			//String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			String MYSQL_QueryIMEI ="update upd.upd_pcba_pgm_imei  set PGM_DATE=NOW(),PGM_STATUS='"+status+"' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
 			pstmt = con.prepareStatement(MYSQL_QueryIMEI);
 			pstmt.execute();
 			logger.info("IMEIStatusFailure-MY SQLQueryIMEI:"+MYSQL_QueryIMEI);
 
 			pstmt = null;
-
-			String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			//july2015 enhancement for intermediate update 
+			//String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='pcba_pgm_failure' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
+			String MYSQL_QueryMEID ="update upd.upd_pcba_pgm_meid  set PGM_DATE=NOW(),PGM_STATUS='"+status+"' where serial_no='"+pcbaProgramQueryInput.getSerialNO()+"'";
 			pstmt = con.prepareStatement(MYSQL_QueryMEID);
 			pstmt.execute();
 			logger.info("IMEIStatusFailure-MY SQLQueryMEID:"+MYSQL_QueryMEID);
+			//july2015 enhancement for intermediate update 
+			
 
 			con.commit();
+			//july2015 enhancement for intermediate update 
+			//response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
+		//	response.setResponseCode(""+ServiceMessageCodes.IMEI_FAILURE);
+		//	response.setResponseMessage(ServiceMessageCodes.IMEI_FAILURE_MSG);
+			if((pcbaProgramQueryInput.getStatus()!=null && !pcbaProgramQueryInput.getStatus().equals("")) && (pcbaProgramQueryInput.getStatus().equalsIgnoreCase("F"))){
+				response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
+				response.setResponseCode(""+ServiceMessageCodes.IMEI_FAILURE);
+				response.setResponseMessage(ServiceMessageCodes.IMEI_FAILURE_MSG);
+			}
+			//july2015 enhancement for intermediate update 
+			StringBuffer intermediteValues = new StringBuffer();
 
-			response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
-			response.setResponseCode(""+ServiceMessageCodes.IMEI_FAILURE);
-			response.setResponseMessage(ServiceMessageCodes.IMEI_FAILURE_MSG);
+			if(pcbaProgramQueryInput.getMsl()!=null && !pcbaProgramQueryInput.getMsl().equals("")){
+				intermediteValues.append(" Msl value:"+pcbaProgramQueryInput.getMsl());
+			}
+			if(pcbaProgramQueryInput.getOtksl()!=null && !pcbaProgramQueryInput.getOtksl().equals("")){
+				intermediteValues.append(" Otksl value:"+pcbaProgramQueryInput.getOtksl());
+			}
+			if(pcbaProgramQueryInput.getServicePassCode()!=null && !pcbaProgramQueryInput.getServicePassCode().equals("")){
+				intermediteValues.append(" ServicePassCode value:"+pcbaProgramQueryInput.getServicePassCode());
+			}
+			
+			if((pcbaProgramQueryInput.getStatus()!=null && !pcbaProgramQueryInput.getStatus().equals("")) && (pcbaProgramQueryInput.getStatus().equalsIgnoreCase("I"))){
+
+				if((pcbaProgramQueryInput.getMsl()!=null && !pcbaProgramQueryInput.getMsl().equals("")) 
+						|| (pcbaProgramQueryInput.getOtksl()!=null && !pcbaProgramQueryInput.getOtksl().equals(""))
+						|| (pcbaProgramQueryInput.getServicePassCode()!=null && !pcbaProgramQueryInput.getServicePassCode().equals(""))){
+
+					response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
+					response.setResponseCode(""+ServiceMessageCodes.IMEI_INTER_FAILURE);
+					response.setResponseMessage(ServiceMessageCodes.LOCK_CODE_MSG+intermediteValues);
+				}else{
+					response.setSerialNO(pcbaProgramQueryInput.getSerialNO());
+					response.setResponseCode(""+ServiceMessageCodes.IMEI_INTER_CODE_FAILURE);
+					response.setResponseMessage(ServiceMessageCodes.LOCK_INTER_CODE_MSG);
+				}
+			}
 
 		}catch(Exception e){
 
