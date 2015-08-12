@@ -447,6 +447,42 @@ public class DispatchSerialNumberMySQLDAO implements DispatchSerialNumberDAO {
 			preparedStmt.setString(2, PCBADataDictionary.MODIFIED_BY);
 			preparedStmt.setString(3, PCBADataDictionary.MODIFIED_BY);
 			preparedStmt.executeUpdate();
+			
+			//insert factory_shipment_info table
+			preparedStmt = null;
+			//String insertFactoryShipment ="INSERT INTO upd.upd_factory_shipment_info (SERIAL_NO,CREATED_BY,CREATED_DATETIME,LAST_MOD_BY,LAST_MOD_DATETIME,gpp_id) VALUES (?,?,NOW(),?,NOW(),?)";
+			String insertFactoryShipment = bundle.getString("IMEI.insertFactoryShipment");
+			preparedStmt = con.prepareStatement(insertFactoryShipment);
+			preparedStmt.setString(1,
+					dispatchSerialResponsePOJO.getNewSerialNo());
+			preparedStmt.setString(2, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(3, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(4, dispatchSerialRequestPOJO.getGppdID());
+			preparedStmt.executeUpdate();
+			
+			//insert device_config table
+			preparedStmt = null;
+			//String insertSeviceConfig ="INSERT INTO upd.upd_device_config (SERIAL_NO,CREATED_BY,CREATED_DATETIME,LAST_MOD_BY,LAST_MOD_DATETIME,ulma,wlan,wlan2,wlan3,wlan4) VALUES (?,?,NOW(),?,NOW(),?,?,?,?,?,?)";
+			String insertDeviceConfig = bundle.getString("IMEI.insertDeviceConfig");
+			preparedStmt = con.prepareStatement(insertDeviceConfig);
+			preparedStmt.setString(1,
+					dispatchSerialResponsePOJO.getNewSerialNo());
+			preparedStmt.setString(2, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(3, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(4, null);
+			preparedStmt.setString(5, null);
+			preparedStmt.setString(6, null);
+			preparedStmt.setString(7, null);
+			preparedStmt.setString(8, null);
+			preparedStmt.setString(9, PCBADataDictionary.IMEI_ATTRIBUTE);
+			List<String> ulmaAddresses = dispatchSerialResponsePOJO.getUlmaAddress();
+			int i=4;
+			for (String ulma : ulmaAddresses) {
+				logger.info("test i" + i);
+				preparedStmt.setString(i, ulma);
+				i++;
+			}
+			preparedStmt.executeUpdate();
 
 			/*
 			 * Setting response parameter
@@ -756,6 +792,42 @@ public class DispatchSerialNumberMySQLDAO implements DispatchSerialNumberDAO {
 					dispatchSerialResponsePOJO.getNewSerialNo());
 			preparedStmt.setString(2, PCBADataDictionary.MODIFIED_BY);
 			preparedStmt.setString(3, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.executeUpdate();
+			
+			//insert factory_shipment_info table
+			preparedStmt = null;
+			//String insertFactoryShipment ="INSERT INTO upd.upd_factory_shipment_info (SERIAL_NO,CREATED_BY,CREATED_DATETIME,LAST_MOD_BY,LAST_MOD_DATETIME,gpp_id) VALUES (?,?,NOW(),?,NOW(),?)";
+			String insertFactoryShipment = bundle.getString("MEID.insertFactoryShipment");
+			preparedStmt = con.prepareStatement(insertFactoryShipment);
+			preparedStmt.setString(1,
+					dispatchSerialResponsePOJO.getNewSerialNo());
+			preparedStmt.setString(2, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(3, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(4, dispatchSerialRequestPOJO.getProtocol());
+			preparedStmt.executeUpdate();
+			
+			//insert device_config table
+			preparedStmt = null;
+			//String insertSeviceConfig ="INSERT INTO upd.upd_device_config (SERIAL_NO,CREATED_BY,CREATED_DATETIME,LAST_MOD_BY,LAST_MOD_DATETIME,ulma,wlan,wlan2,wlan3,wlan4) VALUES (?,?,NOW(),?,NOW(),?,?,?,?,?)";
+			String insertDeviceConfig = bundle.getString("MEID.insertDeviceConfig");
+			preparedStmt = con.prepareStatement(insertDeviceConfig);
+			preparedStmt.setString(1,
+					dispatchSerialResponsePOJO.getNewSerialNo());
+			preparedStmt.setString(2, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(3, PCBADataDictionary.MODIFIED_BY);
+			preparedStmt.setString(4, null);
+			preparedStmt.setString(5, null);
+			preparedStmt.setString(6, null);
+			preparedStmt.setString(7, null);
+			preparedStmt.setString(8, null);
+			preparedStmt.setString(9, PCBADataDictionary.MEID_ATTRIBUTE);
+			List<String> ulmaAddresses = dispatchSerialResponsePOJO.getUlmaAddress();
+			int i=4;
+			for (String ulma : ulmaAddresses) {
+				logger.info("test i" +i);
+				preparedStmt.setString(i, ulma);
+				i++;
+			}
 			preparedStmt.executeUpdate();
 
 			/*

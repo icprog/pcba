@@ -10,6 +10,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+
+import org.apache.log4j.Logger;
+
 import com.mot.upd.pcba.constants.PCBADataDictionary;
 import com.mot.upd.pcba.constants.ServiceMessageCodes;
 import com.mot.upd.pcba.dao.PCBASwapUPDUpdateInterfaceDAO;
@@ -26,7 +29,7 @@ import com.mot.upd.pcba.utils.MEIDException;
  */
 @Path("/swapUpdateRS")
 public class UPDSWAPUpdateRestWebservice {
-
+	private static Logger logger = Logger.getLogger(UPDSWAPUpdateRestWebservice.class);
 
 	@POST
 	@Produces("application/json")
@@ -67,8 +70,10 @@ public class UPDSWAPUpdateRestWebservice {
 
 		if(updConfig!=null && updConfig.equals(PCBADataDictionary.DBCONFIG)){
 			pcbaSwapUPDUpdateInterfaceDAO = new PCBASwapUPDUpdateOracleDAO();
+			//logger.info("inside------------ oracle logic");
 		}else{
 			pcbaSwapUPDUpdateInterfaceDAO = new PCBASwapUPDUpdateSQLDAO();
+			//logger.info("inside------------- Mysql logic");
 		}
 
 		//Check for Mandatory SerialNoin Check
@@ -303,17 +308,20 @@ public class UPDSWAPUpdateRestWebservice {
 
 		//GPP_ID Validation For IMEI Start From 08 July 2015 for Normal case
 		String serialNoStatus = pcbaSwapUPDUpdateInterfaceDAO.getStatus(pCBASerialNoUPdateQueryInput.getSerialNoIn());
-
+		//logger.info("+++++++++++++ACT/BTL++++++++++++++++"+serialNoStatus+"serial in---"+pCBASerialNoUPdateQueryInput.getSerialNoIn());
 		if((serialNoStatus != null && serialNoStatus.startsWith("ACT")) || (serialNoStatus != null && serialNoStatus.startsWith("BTL"))){
-
-			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
-					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
-					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
+		//	logger.info("+++++++++++++ACT/BTL++++++++++++++++");
+			if((pCBASerialNoUPdateQueryInput.getValidation() != null) && 
+					(!pCBASerialNoUPdateQueryInput.getValidation().equals("") )&& 
+					(pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES))){
 
 				// GPPID Validation for IMEI Normal Case
+			//	logger.info("+++++++++++++YES++++++++++++++++");
 
 				if(pCBASerialNoUPdateQueryInput.getSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getSerialNoType().equals("IMEI")){
+				//	logger.info("+++++++++++++IMEI++++++++++++++++");
 					pcbaSerialNoUPdateResponse = pcbaSwapUPDUpdateInterfaceDAO.validateGppId(pCBASerialNoUPdateQueryInput.getSerialNoIn(),pCBASerialNoUPdateQueryInput.getSerialNoOut());
+				//	logger.info("+++++++++++++pcbaSerialNoUPdateResponse++++++++++++++++" +pcbaSerialNoUPdateResponse);
 					if(pcbaSerialNoUPdateResponse.getResponseCode()!=null && !pcbaSerialNoUPdateResponse.getResponseCode().equals("")){
 						return Response.status(200).entity(pcbaSerialNoUPdateResponse).build();
 					}
@@ -348,9 +356,9 @@ public class UPDSWAPUpdateRestWebservice {
 
 		if((dualSerialNoStatus != null && dualSerialNoStatus.startsWith("ACT")) || (dualSerialNoStatus != null && dualSerialNoStatus.startsWith("BTL"))){
 
-			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
-					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
-					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
+			if((pCBASerialNoUPdateQueryInput.getValidation() != null)&& 
+					(!pCBASerialNoUPdateQueryInput.getValidation().equals("")) && 
+					(pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES))){
 
 				//GPPID validation for IMEI Dual SIM Case
 				if(pCBASerialNoUPdateQueryInput.getDualSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getDualSerialNoType().equals("IMEI")){
@@ -386,9 +394,9 @@ public class UPDSWAPUpdateRestWebservice {
 
 		if((triSerialNoStatus != null && triSerialNoStatus.startsWith("ACT")) || (triSerialNoStatus != null && triSerialNoStatus.startsWith("BTL"))){
 
-			if(pCBASerialNoUPdateQueryInput.getValidation() != null && 
-					!pCBASerialNoUPdateQueryInput.getValidation().equals("") && 
-					pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES)){
+			if((pCBASerialNoUPdateQueryInput.getValidation() != null) && 
+					(!pCBASerialNoUPdateQueryInput.getValidation().equals("")) && 
+					(pCBASerialNoUPdateQueryInput.getValidation().equals(PCBADataDictionary.YES))){
 
 				// GPPID Validation for IMEI Tri SIM Case
 				if(pCBASerialNoUPdateQueryInput.getTriSerialNoType()!=null && pCBASerialNoUPdateQueryInput.getTriSerialNoType().equals("IMEI")){
