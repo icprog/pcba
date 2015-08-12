@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -22,18 +23,24 @@ import com.mot.upd.pcba.pojo.PCBASerialNoUPdateQueryInput;
 import com.mot.upd.pcba.pojo.PCBASerialNoUPdateResponse;
 import com.mot.upd.pcba.utils.DBUtil;
 import com.mot.upd.pcba.utils.MEIDException;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
  * @author rviswa
  *
  */
 @Path("/swapUpdateRS")
+@Api(value = "/swapUpdateRS", description = "swapUpdate Service")
 public class UPDSWAPUpdateRestWebservice {
 	private static Logger logger = Logger.getLogger(UPDSWAPUpdateRestWebservice.class);
 
 	@POST
+	@Path("/")
 	@Produces("application/json")
 	@Consumes("application/json")
+	//@ApiOperation(value = "swapUpdateRS", notes = "pcba service")
+	@ApiOperation(value = "swapUpdateRS", notes = "swapUpdate Service", httpMethod = HttpMethod.POST, produces = "application/json")
 	public Response swapSerialNOData(PCBASerialNoUPdateQueryInput pCBASerialNoUPdateQueryInput) throws MEIDException{
 
 

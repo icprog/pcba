@@ -9,9 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
 import org.apache.log4j.Logger;
-
 import com.mot.upd.pcba.constants.PCBADataDictionary;
 import com.mot.upd.pcba.constants.ServiceMessageCodes;
 import com.mot.upd.pcba.dao.R12SnSwapMySQLDAO;
@@ -21,7 +19,8 @@ import com.mot.upd.pcba.pojo.R12SnSwapUpdateQueryInput;
 import com.mot.upd.pcba.pojo.R12SnSwapUpdateQueryResult;
 import com.mot.upd.pcba.utils.DBUtil;
 import com.mot.upd.pcba.utils.MEIDException;
-import com.mot.upd.pcba.utils.MeidUtils;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 
 /**
@@ -29,13 +28,12 @@ import com.mot.upd.pcba.utils.MeidUtils;
  *
  */
 @Path("/serialFetchRS")
+@Api (value = "/serialFetchRS", description = "serialFetch Service")
 public class R12SnSwapUpdateRestWebservice {
 	private static final Logger logger = Logger.getLogger(R12SnSwapUpdateRestWebservice.class);
 	
 	
-	@GET
-	@Path("/{serialIn}")
-	@Produces(MediaType.APPLICATION_JSON)
+	
 	/**
      * RestService for fetch the old serial number for given serial input 
      * @param  serialIn
@@ -43,6 +41,10 @@ public class R12SnSwapUpdateRestWebservice {
      * 		   reference and error details
     
      */	
+	@GET
+	@Path("/{serialIn}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "serialFetchRS", notes = "serialFetch Service")
 	public R12SnSwapUpdateQueryResult r12SnSwapUpdateService(@PathParam("serialIn") String serialIn)throws NamingException,SQLException{
 		//String serialOut = null;
 		//serialIn = "353339060930372";

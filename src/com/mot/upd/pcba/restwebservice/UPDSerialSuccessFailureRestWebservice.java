@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -20,6 +21,8 @@ import com.mot.upd.pcba.pojo.PCBAProgramQueryInput;
 import com.mot.upd.pcba.pojo.PCBAProgramResponse;
 import com.mot.upd.pcba.utils.DBUtil;
 import com.mot.upd.pcba.utils.MEIDException;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 
 
@@ -31,12 +34,15 @@ import com.mot.upd.pcba.utils.MEIDException;
  *
  */
 @Path("/successFailureRS")
+@Api(value="/successFailureRS", description = "successFailure Service")
 public class UPDSerialSuccessFailureRestWebservice {
 	private static Logger logger = Logger.getLogger(UPDSerialSuccessFailureRestWebservice.class);
 
 	@POST
+	@Path("/")
 	@Produces("application/json")
 	@Consumes("application/json")
+	@ApiOperation(value = "successFailureRS", notes = "successFailure Service", httpMethod = HttpMethod.POST, produces = "application/json")
 	public Response updateStatusOfSerialNO(PCBAProgramQueryInput pcbaProgramQueryInput){
 
 		PCBAProgramResponse pcbaProgramResponse = new PCBAProgramResponse();

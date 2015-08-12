@@ -6,13 +6,12 @@ import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-
 import org.apache.log4j.Logger;
-
 import com.mot.upd.pcba.constants.PCBADataDictionary;
 import com.mot.upd.pcba.constants.ServiceMessageCodes;
 import com.mot.upd.pcba.dao.DispatchSerialNumberDAO;
@@ -21,19 +20,24 @@ import com.mot.upd.pcba.dao.DispatchSerialNumberOracleDAO;
 import com.mot.upd.pcba.pojo.DispatchSerialRequestPOJO;
 import com.mot.upd.pcba.pojo.DispatchSerialResponsePOJO;
 import com.mot.upd.pcba.utils.DBUtil;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
  * @author HRDJ36
  *
  */
-@Path("/dispatchserialNumber")
+@Path("/dispatchserialNumberRS")
+@Api(value = "/dispatchserialNumberRS", description = "dispatch Service")
 public class UPDDispatchSerialRestWebservice {
 	private static Logger logger = Logger
 			.getLogger(UPDDispatchSerialRestWebservice.class);
 
 	@POST
+	@Path("/")
 	@Produces("application/json")
 	@Consumes("application/json")
+	@ApiOperation(value = "dispatchserialNumber", notes = "dispatch Service", httpMethod = HttpMethod.POST, produces = "application/json")
 	public Response doGetSerialNumber(
 			DispatchSerialRequestPOJO dispatchSerialRequestPOJO) {
 
