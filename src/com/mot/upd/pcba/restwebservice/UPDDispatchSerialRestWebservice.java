@@ -27,8 +27,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
  * @author HRDJ36
  *
  */
-@Path("/dispatchserialNumberRS")
-@Api(value = "/dispatchserialNumberRS", description = "dispatch Service")
+@Path("/dispatch/dispatchserialNumber")
+@Api(value = "/dispatchserialNumber", description = "dispatch Service")
 public class UPDDispatchSerialRestWebservice {
 	private static Logger logger = Logger
 			.getLogger(UPDDispatchSerialRestWebservice.class);

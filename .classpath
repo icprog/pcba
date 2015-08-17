@@ -12,5 +12,9 @@
 	<classpathentry kind="lib" path="C:/Users/murugan/.ssh/pcba/WebContent/WEB-INF/lib/jaxrs-api-3.0.6.Final.jar"/>
 	<classpathentry kind="lib" path="C:/PCB/Git_PCBA_tammy/27042015/pcba-master/pcba-master/WebContent/WEB-INF/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="C:/Users/murugan/.ssh/pcba/WebContent/WEB-INF/lib/mail.jar"/>
+	<classpathentry kind="lib" path="C:/PCB/lib/swagger/jboss-servlet-api_3.1_spec-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="C:/PCB/lib/swagger/swagger-annotations-1.3.6.jar"/>
+	<classpathentry kind="lib" path="C:/PCB/lib/swagger/swagger-core_2.10-1.3.6.jar"/>
+	<classpathentry kind="lib" path="C:/PCB/lib/swagger/swagger-jaxrs_2.10-1.3.6.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -12,7 +12,7 @@
   	</filter>
   	<filter-mapping>
     	<filter-name>serialFetchFilter</filter-name>
-    		<url-pattern>/serialFetchRS/*</url-pattern>
+    		<url-pattern>/swapSerial/serialFetchRS/*</url-pattern>
     		<url-pattern>/api-docs/*</url-pattern>
   	</filter-mapping>
   	<filter>
@@ -27,7 +27,7 @@
   	</filter>
   	<filter-mapping>
     	<filter-name>DispatchFilter</filter-name>
-    		<url-pattern>/dispatchserialNumberRS/*</url-pattern>
+    		<url-pattern>/dispatch/dispatchserialNumber/*</url-pattern>
     		<url-pattern>/api-docs/*</url-pattern>
   	</filter-mapping>
   	<filter>
@@ -42,7 +42,7 @@
   	</filter>
   	<filter-mapping>
     	<filter-name>swapUpdateFilter</filter-name>
-    		<url-pattern>/swapUpdateRS/*</url-pattern>
+    		<url-pattern>/swapUpdate/swapUpdateRS/*</url-pattern>
     		<url-pattern>/api-docs/*</url-pattern>
   	</filter-mapping>
   	<filter>
@@ -57,7 +57,7 @@
   	</filter>
   	<filter-mapping>
     	<filter-name>sfFilter</filter-name>
-    		<url-pattern>/successFailureRS/*</url-pattern>
+    		<url-pattern>/successFailure/successFailureRS/*</url-pattern>
     		<url-pattern>/api-docs/*</url-pattern>
   	</filter-mapping>
    	<context-param>

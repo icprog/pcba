@@ -27,7 +27,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  * @author Quinnox Dev Team
  *
  */
-@Path("/serialFetchRS")
+@Path("/swapSerial/serialFetchRS")
 @Api (value = "/serialFetchRS", description = "serialFetch Service")
 public class R12SnSwapUpdateRestWebservice {
 	private static final Logger logger = Logger.getLogger(R12SnSwapUpdateRestWebservice.class);

@@ -33,7 +33,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  * @author Quinnox Dev Team
  *
  */
-@Path("/successFailureRS")
+@Path("/successFailure/successFailureRS")
 @Api(value="/successFailureRS", description = "successFailure Service")
 public class UPDSerialSuccessFailureRestWebservice {
 	private static Logger logger = Logger.getLogger(UPDSerialSuccessFailureRestWebservice.class);

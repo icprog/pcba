@@ -30,7 +30,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  * @author rviswa
  *
  */
-@Path("/swapUpdateRS")
+@Path("/swapUpdate/swapUpdateRS")
 @Api(value = "/swapUpdateRS", description = "swapUpdate Service")
 public class UPDSWAPUpdateRestWebservice {
 	private static Logger logger = Logger.getLogger(UPDSWAPUpdateRestWebservice.class);
